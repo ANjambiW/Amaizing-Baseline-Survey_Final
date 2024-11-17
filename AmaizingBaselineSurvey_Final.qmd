@@ -1,0 +1,6222 @@
+---
+title: "Amaizing  Baseline Survey_Final"
+author: "Njambi"
+format: html
+editor: visual
+---
+
+## 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Clear the environment
+
+```{r}
+
+rm(list = ls())
+
+```
+
+## Loading necessary libraries
+
+```{r, include=FALSE}
+
+library(tidyverse) # includes the dplyr, ggplot2, tidyr, readr, stringr, forcats, tibble packages
+library(readxl)
+library(Hmisc)
+library(labelled)
+library(magrittr)
+library(datawizard)
+library(gtsummary)
+library(gt)
+library(kableExtra)
+library(flextable)
+library(splitstackshape)
+library(lubridate)
+library(foreign)
+library(haven)
+library(codebook)
+library(summarytools)
+
+
+```
+
+## Set the working directory
+
+```{r, include=FALSE}
+
+# Set working directory
+
+setwd("C:\\Users\\awanjau\\OneDrive - CGIAR\\Alliance\\Alliance_2024\\AMAZING\\AmazingBaselineDataCleaning\\Amaizing  Baseline Survey_Final")
+      
+```
+
+## Loading data
+
+```{r}
+# Read a csv file
+
+aMaizingBL_parent_data_path <- "C:\\Users\\awanjau\\OneDrive - CGIAR\\Alliance\\Alliance_2024\\AMAZING\\aMaizingBaseline_Files\\Amaizing  Baseline Survey_Final.csv"
+
+aMaizingBL_parent_data <- read_csv(aMaizingBL_parent_data_path)
+
+head(aMaizingBL_parent_data)
+```
+
+```{r}
+# Check number of rows and columns in data
+
+dim(aMaizingBL_parent_data)
+
+# Print column names
+
+#names(aMaizingBL_parent_data)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a1)
+#sort(unique(aMaizingBL_parent_data$a1), na.last = TRUE)
+
+# Farmer ID
+```
+
+Questionnaire defines it as numeric, but converted to character during cleaning.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a1 = as.character(a1)
+  )
+
+class(aMaizingBL_parent_data$a1)
+#unique(aMaizingBL_parent_data$a1)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a2_1)
+#sort(unique(aMaizingBL_parent_data$a2_1), na.last = TRUE)
+
+# First name
+#Drop this column
+```
+
+```{r}
+class(aMaizingBL_parent_data$a2_2)
+#sort(unique(aMaizingBL_parent_data$a2_2), na.last = TRUE)
+
+# Second name
+#Drop this column
+```
+
+```{r}
+# County
+
+class(aMaizingBL_parent_data$a2_3)
+sort(unique(aMaizingBL_parent_data$a2_3), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a2_3 = factor(a2_3, levels = c(1, 2, 3, 4, 5), labels = c("Bungoma", "Busia", "Makueni", "Embu", "Uasin Gishu"))
+    
+  )
+
+class(aMaizingBL_parent_data$a2_3)
+sort(unique(aMaizingBL_parent_data$a2_3), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$comments)
+#sort(unique(aMaizingBL_parent_data$comments), na.last = TRUE)
+
+# Drop this column
+```
+
+```{r}
+class(aMaizingBL_parent_data$a2_4)
+sort(unique(aMaizingBL_parent_data$a2_4), na.last = TRUE)
+```
+
+```{r}
+# subcounty
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a2_4 = factor(a2_4, levels = c(1, 2, 3, 4, 5,6, 7, 8, 9, 10, 11, 12, 13, 14), labels = c("Kathonzweni", "Mbooni East", "Mbooni West", "Makueni", "Mbeere South", "Mbeere North", "Turbo", "Soy", "Ainabkoi", "Bungoma South", "Bumula", "Matayos", "Matayos", "Teso South"  ))
+    
+  )
+
+class(aMaizingBL_parent_data$a2_4)
+sort(unique(aMaizingBL_parent_data$a2_4), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a2_5)
+#sort(unique(aMaizingBL_parent_data$a2_5), na.last = TRUE)
+
+# Village
+# Replace phone number with NA, then convert to factor
+# Drop this column
+```
+
+-   Remove "07\*\*\*\*\*\*27".
+-   Convert to title case.\
+-   Remove extra spaces.\
+-   Fromat as factor.\
+    ***NB: Village names are not unique and should therefore be used with caution.***
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a2_5 = str_remove_all(a2_5, "\\d"),
+    a2_5 = str_to_title(a2_5),
+    a2_5 = str_squish(a2_5),
+    a2_5 = factor(a2_5)
+    
+           )
+
+class(aMaizingBL_parent_data$a2_5)
+#sort(unique(aMaizingBL_parent_data$a2_5), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a4)
+sort(unique(aMaizingBL_parent_data$a4), na.last = TRUE)
+
+```
+
+1 Yes 0 No
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a4 = factor(a4, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$a4)
+sort(unique(aMaizingBL_parent_data$a4), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a5)
+sort(unique(aMaizingBL_parent_data$a5), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a5 = factor(a5, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$a5)
+sort(unique(aMaizingBL_parent_data$a5), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a6)
+sort(unique(aMaizingBL_parent_data$a6), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a6 = factor(a6, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$a6)
+sort(unique(aMaizingBL_parent_data$a6), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a8)
+sort(unique(aMaizingBL_parent_data$a8), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a8 = factor(a8, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$a8)
+sort(unique(aMaizingBL_parent_data$a8), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a3)
+sort(unique(aMaizingBL_parent_data$a3), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a3 = factor(a3, levels = c(1, 2), labels = c("Swahili", "English"))
+    
+  )
+
+class(aMaizingBL_parent_data$a3)
+sort(unique(aMaizingBL_parent_data$a3), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$b1)
+unique(aMaizingBL_parent_data$b1)
+```
+
+Format as date. ***The 2-digit year, eg, 52 is formated as `2052` after mutate. Variable left as text.***
+
+```{r}
+
+# aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+#   mutate(b1 = dmy(b1))
+# 
+# class(aMaizingBL_parent_data$b1)
+# unique(aMaizingBL_parent_data$b1) 
+```
+
+```{r}
+class(aMaizingBL_parent_data$b2)
+unique(aMaizingBL_parent_data$b2)
+```
+
+1 Male 0 Female
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b2 = factor(b2, levels = c(0, 1), labels = c("Female", "Male"))
+    
+  )
+
+class(aMaizingBL_parent_data$b2)
+sort(unique(aMaizingBL_parent_data$b2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$b3)
+sort(unique(aMaizingBL_parent_data$b3), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b3 = factor(b3, levels = c(1, 2, 3, 4), labels = c("Single", "Married", "Widow/Widower", "Divorced/separated"))
+    
+  )
+
+class(aMaizingBL_parent_data$b3)
+sort(unique(aMaizingBL_parent_data$b3), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$b4)
+sort(unique(aMaizingBL_parent_data$b4), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b4 = as.integer(b4)
+  )
+
+class(aMaizingBL_parent_data$b4)
+sort(unique(aMaizingBL_parent_data$b4), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$b4_1)
+sort(unique(aMaizingBL_parent_data$b4_1), na.last = TRUE)
+```
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b4_1 = factor(b4_1, levels = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), labels = c("None", "Primary Incomplete", "Primary completed (up to KCPE/CPE)", "Secondary Incomplete", "Secondary completed (up to KCSE/A-levels)", "Vocational training",  "Certificate/Trade School", "Diploma", "Collage", "University B.Sc./B.A.", "University M.Sc./M.A.", "University PhD" ), ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$b4_1)
+sort(unique(aMaizingBL_parent_data$b4_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$b5)
+sort(unique(aMaizingBL_parent_data$b5), na.last = TRUE)
+```
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b5 = factor(b5, levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, -222), labels = c("Farming", "Agro-dealer/input trader", "Buys/trades food stocks", "Owns other type of food business", "Non-food business owner/trader", "Agricultural day labor",  "Non-agricultural day labor", "Employed as domestic worker", "Other informal employment",  "Employed in formal sector", "Looking for work / unemployed", "Housework/housewife",  "Too old to work / retire", "Student", "Other (specify)" ))
+    
+  )
+
+class(aMaizingBL_parent_data$b5)
+sort(unique(aMaizingBL_parent_data$b5), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$b5_sp)
+sort(unique(aMaizingBL_parent_data$b5_sp), na.last = TRUE)
+```
+
+-   Replace "Bodaboda ryder" with "Boda business".\
+-   Replace b5 == "Other (specify)" with b5_sp
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b5_sp = str_replace(b5_sp, "Bodaboda ryder", "Boda business"),
+    #mainOccupation = as.character(mainOccupation),
+    b5 = str_replace_all(as.character(b5), "Other \\(specify\\)",
+                                                replacement = b5_sp),
+    b5 = factor(b5)
+    )
+
+class(aMaizingBL_parent_data$b5)
+sort(unique(aMaizingBL_parent_data$b5), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$b5_index)
+sort(unique(aMaizingBL_parent_data$b5_index), na.last = TRUE)
+
+# Drop this column
+```
+
+```{r}
+class(aMaizingBL_parent_data$b6)
+sort(unique(aMaizingBL_parent_data$b6), na.last = TRUE)
+```
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b6 = as.integer(b6)
+  )
+
+class(aMaizingBL_parent_data$b6)
+sort(unique(aMaizingBL_parent_data$b6), na.last = TRUE)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$b7_1)
+sort(unique(aMaizingBL_parent_data$b7_1), na.last = TRUE)
+```
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b7_1 = as.integer(b7_1),
+    b7_2 = as.integer(b7_2),
+    b7_3 = as.integer(b7_3),
+    b7_4 = as.integer(b7_4),
+    hhsize = as.integer(hhsize)
+  )
+
+class(aMaizingBL_parent_data$b7_1)
+sort(unique(aMaizingBL_parent_data$b7_1), na.last = TRUE)
+
+class(aMaizingBL_parent_data$b7_2)
+sort(unique(aMaizingBL_parent_data$b7_2), na.last = TRUE)
+
+class(aMaizingBL_parent_data$b7_3)
+sort(unique(aMaizingBL_parent_data$b7_3), na.last = TRUE)
+
+class(aMaizingBL_parent_data$b7_4)
+sort(unique(aMaizingBL_parent_data$b7_4), na.last = TRUE)
+
+class(aMaizingBL_parent_data$hhsize)
+sort(unique(aMaizingBL_parent_data$hhsize), na.last = TRUE)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$b8)
+sort(unique(aMaizingBL_parent_data$b8), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    b8 = factor(b8, levels = c(1, 2, 3), labels = c("Male headed", "Female headed", "Other Household members"))
+    )
+    
+class(aMaizingBL_parent_data$b8)
+sort(unique(aMaizingBL_parent_data$b8), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$c1)
+sort(unique(aMaizingBL_parent_data$c1), na.last = TRUE)
+```
+
+```{r}
+
+# mutate c1_fct by converting c1 to factor
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c1_fct = factor(c1, levels = c(0, 3, 6, 10, 14, 21, 25, 34), labels = c("8 or more", "7",	"6", "5",	"4", "3", "2",	"1"), ordered = TRUE)
+    
+  )
+
+unique(aMaizingBL_parent_data$c1_fct)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c2)
+sort(unique(aMaizingBL_parent_data$c2), na.last = TRUE)
+```
+
+```{r}
+
+# mutate c2_fct to factor
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c2_fct = factor(c2, levels = c(0, 6, 10), labels = c("None", "One", "Two or more"), ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$c2_fct)
+sort(unique(aMaizingBL_parent_data$c2_fct), na.last = TRUE)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c3)
+sort(unique(aMaizingBL_parent_data$c3), na.last = TRUE)
+```
+
+```{r}
+
+# convert c2 to factor
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c3_fct = factor(c3, levels = c(0, 4), labels = c("Yes", "No"), ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$c3_fct)
+sort(unique(aMaizingBL_parent_data$c3_fct), na.last = TRUE)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c4)
+sort(unique(aMaizingBL_parent_data$c4), na.last = TRUE)
+```
+
+0 No 2 Yes
+
+```{r}
+
+
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c4_fct = factor(c4, levels = c(0, 2), labels = c("No", "Yes"), ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$c4_fct)
+sort(unique(aMaizingBL_parent_data$c4_fct), na.last = TRUE)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c5)
+sort(unique(aMaizingBL_parent_data$c5), na.last = TRUE)
+```
+
+0 Yes 5 No
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c5_fct = factor(c5, levels = c(0, 5), labels = c("Yes", "No"), ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$c5_fct)
+sort(unique(aMaizingBL_parent_data$c5_fct), na.last = TRUE)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c6)
+sort(unique(aMaizingBL_parent_data$c6), na.last = TRUE)
+```
+
+0 No 0 2 No male head/spouse 3 Yes
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c6_fct = factor(c6, levels = c(0, 2, 3), labels = c("No", "No male head/spouse", "Yes"), ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$c6_fct)
+sort(unique(aMaizingBL_parent_data$c6_fct), na.last = TRUE)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c7)
+sort(unique(aMaizingBL_parent_data$c7), na.last = TRUE)
+```
+
+```{r}
+
+# convert c7 to factor
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c7_fct = factor(c7, levels = c(0, 4, 7, 8, 10, 16), labels = c("None, madrassa/duksi, pre-primary, primary grade 1, or other", "Primary grades 2 to 6", "Primary grades 7 or 8", "No female head/spouse", "Secondary years 1 to 3", "Secondary year 4, or higher"), ordered = TRUE)
+    
+  )
+
+unique(aMaizingBL_parent_data$c7_fct)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c8)
+sort(unique(aMaizingBL_parent_data$c8), na.last = TRUE)
+```
+
+```{r}
+
+# convert c8 to factor
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c8_fct = factor(c8, levels = c(0, 5, 8, 12), labels = c("One, or none", "Two", "Three", "Four or more"), ordered = TRUE)
+    
+  )
+
+unique(aMaizingBL_parent_data$c8_fct)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c9)
+sort(unique(aMaizingBL_parent_data$c9), na.last = TRUE)
+```
+
+```{r}
+
+# convert c9 to factor
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c9_fct = factor(c9, levels = c(0, 1, 5), labels = c("Cane/palm/trunks, mud/cow dung, grass/reeds, no walls, or other", "Corrugated iron sheets, plywood, cardboard, or reused wood", "Bamboo with mud, stone with mud, uncovered adobe, covered adobe, stone with lime/cement, cement, bricks, cement blocks, or wood planks/shingles"), ordered = TRUE)
+    
+  )
+
+unique(aMaizingBL_parent_data$c9_fct)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$c10)
+sort(unique(aMaizingBL_parent_data$c10), na.last = TRUE)
+```
+
+```{r}
+
+# convert c10 to factor
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    c10_fct = factor(c10, levels = c(0, 9), labels = c("No", "Yes"), ordered = TRUE)
+    
+  )
+
+unique(aMaizingBL_parent_data$c10_fct)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$d1)
+sort(unique(aMaizingBL_parent_data$d1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d1_1)
+sort(unique(aMaizingBL_parent_data$d1_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d2)
+sort(unique(aMaizingBL_parent_data$d2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d2_1)
+sort(unique(aMaizingBL_parent_data$d2_1), na.last = TRUE)
+```
+
+***Be cautious about the `2000` in `d2_1`.***
+
+```{r}
+class(aMaizingBL_parent_data$d3)
+sort(unique(aMaizingBL_parent_data$d3), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d3_1)
+sort(unique(aMaizingBL_parent_data$d3_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d4)
+sort(unique(aMaizingBL_parent_data$d4), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d4_1)
+sort(unique(aMaizingBL_parent_data$d4_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d4_1)
+sort(unique(aMaizingBL_parent_data$d4_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d5)
+sort(unique(aMaizingBL_parent_data$d5), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d5_1)
+sort(unique(aMaizingBL_parent_data$d5_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$totalland)
+sort(unique(aMaizingBL_parent_data$totalland), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d6_1)
+sort(unique(aMaizingBL_parent_data$d6_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d6_2)
+sort(unique(aMaizingBL_parent_data$d6_2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d2_2)
+sort(unique(aMaizingBL_parent_data$d2_2), na.last = TRUE)
+```
+
+Replace -888 with NA
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    d2_2 = case_when(
+      
+      d2_2 == -888 ~ NA_integer_,
+      
+      TRUE ~ d2_2
+    )
+  )
+
+class(aMaizingBL_parent_data$d2_2)
+sort(unique(aMaizingBL_parent_data$d2_2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$d3_2)
+sort(unique(aMaizingBL_parent_data$d3_2), na.last = TRUE)
+```
+
+Replace -888 with NA
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    d3_2 = case_when(
+      
+      d3_2 == -888 ~ NA_integer_,
+      
+      TRUE ~ d3_2
+    )
+  )
+
+class(aMaizingBL_parent_data$d3_2)
+sort(unique(aMaizingBL_parent_data$d3_2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$e0)
+sort(unique(aMaizingBL_parent_data$e0), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    e0 = as.integer(e0)
+  )
+
+class(aMaizingBL_parent_data$e0)
+sort(unique(aMaizingBL_parent_data$e0), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$rp_plot_count)
+sort(unique(aMaizingBL_parent_data$rp_plot_count), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rp_plot_count = as.integer(rp_plot_count)
+  )
+
+class(aMaizingBL_parent_data$rp_plot_count)
+sort(unique(aMaizingBL_parent_data$rp_plot_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rp_plot`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rp_plot`), na.last = TRUE)
+
+# ID column
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$plotid1)
+#sort(unique(aMaizingBL_parent_data$plotid1), na.last = TRUE)
+
+# Plot ID column
+```
+
+```{r}
+class(aMaizingBL_parent_data$plotid2)
+#sort(unique(aMaizingBL_parent_data$plotid2), na.last = TRUE)
+
+# Plot ID column
+```
+
+```{r}
+class(aMaizingBL_parent_data$plotid3)
+#sort(unique(aMaizingBL_parent_data$plotid3), na.last = TRUE)
+
+# Plot ID column
+```
+
+```{r}
+class(aMaizingBL_parent_data$plotid4)
+#sort(unique(aMaizingBL_parent_data$plotid4), na.last = TRUE)
+
+# Plot ID column
+```
+
+```{r}
+class(aMaizingBL_parent_data$plotid5)
+#sort(unique(aMaizingBL_parent_data$plotid5), na.last = TRUE)
+
+# Plot ID column
+```
+
+```{r}
+# Create a vector of column names for columns plotid6 to plotid25
+
+colnames_plotid <- paste0("plotid", 6:25)
+
+# Apply the class() and sort(unique()) functions to each column
+
+results_plotid <- lapply(colnames_plotid, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_plotid <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values
+  
+  sorted_uv_plotid <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class_plotid = col_class_plotid, sorted_unique_plotid = sorted_uv_plotid)
+})
+
+# Assign names to the results for clarity
+
+names(results_plotid) <- colnames_plotid
+
+# Print results
+
+results_plotid
+
+```
+
+Drop `plotid6:plotid25`; these columns are blank.
+
+```{r}
+class(aMaizingBL_parent_data$f0)
+sort(unique(aMaizingBL_parent_data$f0), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+class(aMaizingBL_parent_data$f0_1)
+sort(unique(aMaizingBL_parent_data$f0_1), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    f0_1 = as.integer(f0_1)
+  )
+
+class(aMaizingBL_parent_data$f0_1)
+sort(unique(aMaizingBL_parent_data$f0_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$f0_2)
+sort(unique(aMaizingBL_parent_data$f0_2), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    f0_2 = as.integer(f0_2)
+  )
+
+class(aMaizingBL_parent_data$f0_2)
+sort(unique(aMaizingBL_parent_data$f0_2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$f0_3)
+sort(unique(aMaizingBL_parent_data$f0_3), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    f0_3 = as.integer(f0_3)
+  )
+
+class(aMaizingBL_parent_data$f0_3)
+sort(unique(aMaizingBL_parent_data$f0_3), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$f0_4)
+sort(unique(aMaizingBL_parent_data$f0_4), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    f0_4 = as.integer(f0_4)
+  )
+
+class(aMaizingBL_parent_data$f0_4)
+sort(unique(aMaizingBL_parent_data$f0_4), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$f0_5)
+sort(unique(aMaizingBL_parent_data$f0_5), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    f0_5 = as.integer(f0_5)
+  )
+
+class(aMaizingBL_parent_data$f0_5)
+sort(unique(aMaizingBL_parent_data$f0_5), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$rp_crop_count)
+sort(unique(aMaizingBL_parent_data$rp_crop_count), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rp_crop_count = as.integer(rp_crop_count)
+  )
+
+class(aMaizingBL_parent_data$rp_crop_count)
+sort(unique(aMaizingBL_parent_data$rp_crop_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rp_crop`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rp_crop`), na.last = TRUE)
+
+# ID column
+```
+
+```{r}
+class(aMaizingBL_parent_data$extra_crops)
+#sort(unique(aMaizingBL_parent_data$extra_crops), na.last = TRUE)
+
+# Multi-select question
+```
+
+```{r}
+
+# Obatin names of columns starting with "extra_crops_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("extra_crops_")) %>%
+  names()
+```
+
+```{r}
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_extra_crops <- paste0("extra_crops_", c(1:20, "_222", "_221", "_220", 21, 26, 28, 22, "sp1", "sp2", "sp3"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_extra_crops <- lapply(colnames_extra_crops, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_extra_crops <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_extra_crops <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class_extra_crops = col_class_extra_crops, sorted_unique_extra_crops = sorted_uv_extra_crops)
+})
+
+# Assign names to the results for clarity
+
+names(results_extra_crops) <- colnames_extra_crops
+
+# Print the results
+
+results_extra_crops
+
+  
+
+```
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("extra_crops_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_extra_crops <- paste0("extra_crops_", c(1:20, "_222", "_221", "_220", 21, 26, 28, 22, "sp1", "sp2", "sp3"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_extra_crops <- lapply(colnames_extra_crops, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_extra_crops <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_extra_crops <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class_extra_crops = col_class_extra_crops, sorted_unique_extra_crops = sorted_uv_extra_crops)
+})
+
+# Assign names to the results for clarity
+
+names(results_extra_crops) <- colnames_extra_crops
+
+# Print the results
+
+results_extra_crops
+
+```
+
+***Columns `extra_crops_sp1`, `extra_crops_sp2`, and `extra_crops_sp2`, are character types and have not been cleaned.***
+
+***Drop columns "end_production", "time_production", and "start_livestock"***
+
+```{r}
+class(aMaizingBL_parent_data$g1)
+sort(unique(aMaizingBL_parent_data$g1), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    g1 = factor(g1, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$g1)
+sort(unique(aMaizingBL_parent_data$g1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$g1_1)
+#sort(unique(aMaizingBL_parent_data$g1_1), na.last = TRUE)
+
+# Multi-select column
+```
+
+```{r}
+
+# Obatin names of columns starting with "g1_1_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("g1_1_")) %>%
+  names()
+```
+
+```{r}
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_livestock <- paste0("g1_1_", c(1:13, 18, 14:17, "_222"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_livestock <- lapply(colnames_livestock, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_livestock <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_livestock <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_livestock, sorted_unique_livestock = sorted_uv_livestock)
+})
+
+# Assign names to the results for clarity
+
+names(results_livestock) <- colnames_livestock
+
+# Print the results
+
+results_livestock
+
+  
+
+```
+
+***Columns `g1_1_16 and g1_1_17` have only zero as a value; drop these columns.***
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("g1_1_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_livestock <- paste0("g1_1_", c(1:13, 18, 14:17, "_222"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_livestock <- lapply(colnames_livestock, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_livestock <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_livestock <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_livestock, sorted_unique_livestock = sorted_uv_livestock)
+})
+
+# Assign names to the results for clarity
+
+names(results_livestock) <- colnames_livestock
+
+# Print the results
+
+results_livestock
+
+  
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$g1_1sp)
+sort(unique(aMaizingBL_parent_data$g1_1sp), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    g1_1sp = case_when(
+      g1_1sp %in% c("5 Ducks", "Duck", "Ducks") ~ "Ducks",
+      g1_1sp == "Goose" ~ "Geese",
+      g1_1sp == "Goat kids" ~ "Goats",
+      g1_1sp == "Fowl" ~ "Guinea fowl",
+      
+      TRUE ~ g1_1sp
+    ),
+    
+    g1_1sp = factor(g1_1sp)
+  )
+
+
+class(aMaizingBL_parent_data$g1_1sp)
+unique(aMaizingBL_parent_data$g1_1sp)
+```
+
+```{r}
+class(aMaizingBL_parent_data$rpm7_count)
+unique(aMaizingBL_parent_data$rpm7_count)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rpm7_count = as.integer(rpm7_count)
+  )
+
+class(aMaizingBL_parent_data$rpm7_count)
+sort(unique(aMaizingBL_parent_data$rpm7_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rpm7`)
+#unique(aMaizingBL_parent_data$`SET-OF-rpm7`)
+
+# id column
+```
+
+```{r}
+class(aMaizingBL_parent_data$g0_p)
+sort(unique(aMaizingBL_parent_data$g0_p), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    g0_p = factor(g0_p, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$g0_p)
+sort(unique(aMaizingBL_parent_data$g0_p), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$g1_p)
+sort(unique(aMaizingBL_parent_data$g1_p), na.last = TRUE)
+
+# Multi-select column
+```
+
+```{r}
+
+# Obatin names of columns starting with "extra_crops_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("g1_p_")) %>%
+  names()
+```
+
+```{r}
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_lproducts <- paste0("g1_p_", c(1:9))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_lproducts <- lapply(colnames_lproducts, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_lproducts <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_lproducts <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_lproducts, sorted_unique_lproducts = sorted_uv_lproducts)
+})
+
+# Assign names to the results for clarity
+
+names(results_lproducts) <- colnames_lproducts
+
+# Print the results
+
+results_lproducts
+
+  
+
+```
+
+***`g1_p_3`, `g1_p_5`, `g1_p_8` have only zeros; drop these columns.***
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("g1_p_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_lproducts <- paste0("g1_p_", c(1:9))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_lproducts <- lapply(colnames_lproducts, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_lproducts <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_lproducts <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_lproducts, sorted_unique_lproducts = sorted_uv_lproducts)
+})
+
+# Assign names to the results for clarity
+
+names(results_lproducts) <- colnames_lproducts
+
+# Print the results
+
+results_lproducts
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$rg1_p_count)
+sort(unique(aMaizingBL_parent_data$rg1_p_count), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rg1_p_count = as.integer(rg1_p_count)
+  )
+
+class(aMaizingBL_parent_data$rg1_p_count)
+sort(unique(aMaizingBL_parent_data$rg1_p_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rg1_p`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rg1_p`), na.last = TRUE)
+
+# ID column
+```
+
+***Drop columns `"end_livestock", "time_livestock", "start_insurance"`; interpreted them as audit columns.***
+
+```{r}
+class(aMaizingBL_parent_data$h1)
+sort(unique(aMaizingBL_parent_data$h1), na.last = TRUE)
+
+# Multi-select column
+```
+
+```{r}
+
+# Obatin names of columns starting with "h1_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h1_")) %>%
+  names()
+```
+
+```{r}
+# Check `h1_1...187` == `h1_1...203`
+
+are_columns_equal <- aMaizingBL_parent_data$`h1_1...187` == aMaizingBL_parent_data$`h1_1...203`
+
+#are_columns_equal
+
+# Check how many values are equal
+
+table(are_columns_equal)
+
+# `h1_1...187` != `h1_1...203`
+
+```
+
+```{r}
+# Mutate inconsistent_h1_1
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(inconsistent_h1_1 = `h1_1...187` != `h1_1...203`)
+
+# Filter inconsistent rows
+
+inconsistent_h1_1_187 <- aMaizingBL_parent_data %>%
+  filter(inconsistent_h1_1 == TRUE) %>%
+  select(`h1_1...187`, `h1_1...203`)
+
+inconsistent_h1_1_187
+
+```
+
+***Mutate h1_1 = `h1_1...187`, which appears first, then drop `h1_1...187`.***\
+***`h1_1...203` was created as h1_1 by `calculate` in xlsx form.***
+
+***Drop `inconsistent_h1_1`.***
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(h1_1 = `h1_1...187`)
+  
+unique(aMaizingBL_parent_data$h1_1)
+  
+```
+
+```{r}
+
+# Obtain names of columns starting with "h1_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h1_")) %>%
+  names()
+```
+
+```{r}
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_insurance <- paste0("h1_", c(1:5, "_222", "_666", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_insurance <- lapply(colnames_insurance, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_insurance <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_insurance <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_insurance, sorted_unique_insurance = sorted_uv_insurance)
+})
+
+# Assign names to the results for clarity
+
+names(results_insurance) <- colnames_insurance
+
+# Print the results
+
+results_insurance
+
+```
+
+`h1_sp` is text type and has not been cleaned.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h1_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+
+# Create a vector of column names 
+
+colnames_insurance <- paste0("h1_", c(1:5, "_222", "_666", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_insurance <- lapply(colnames_insurance, function(col) {
+  
+  # Get the class of the column
+  
+  col_class_insurance <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_insurance <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_insurance, sorted_unique_insurance = sorted_uv_insurance)
+})
+
+# Assign names to the results for clarity
+
+names(results_insurance) <- colnames_insurance
+
+# Print the results
+
+results_insurance
+```
+
+```{r}
+class(aMaizingBL_parent_data$h2)
+sort(unique(aMaizingBL_parent_data$h2), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h2_")) %>%
+  names()
+```
+
+Mutate h2_1 = `h2_1...196` and drop `h2_1...196`
+
+```{r}
+# Mutate h2_1 
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(h2_1 = `h2_1...196`)
+
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_insurance_h2 <- paste0("h2_", c(1:5, "_222", "_666"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_insurance_h2 <- lapply(colnames_insurance_h2, function(col) {
+  
+  # Get the class of the column
+  
+col_class_insurance_h2 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_insurance_h2 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_insurance_h2, sorted_unique_insurance_h2 = sorted_uv_insurance_h2)
+})
+
+# Assign names to the results for clarity
+
+names(results_insurance_h2) <- colnames_insurance_h2
+
+# Print the results
+
+results_insurance_h2
+
+```
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h2_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Mutate h2_1 
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(h2_1 = `h2_1...196`)
+
+
+# Create a vector of column names (extra_crops_1 to extra_crops_sp3)
+
+colnames_insurance_h2 <- paste0("h2_", c(1:5, "_222", "_666"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_insurance_h2 <- lapply(colnames_insurance_h2, function(col) {
+  
+  # Get the class of the column
+  
+col_class_insurance_h2 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_insurance_h2 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_insurance_h2, sorted_unique_insurance_h2 = sorted_uv_insurance_h2)
+})
+
+# Assign names to the results for clarity
+
+names(results_insurance_h2) <- colnames_insurance_h2
+
+# Print the results
+
+results_insurance_h2
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$`h1_1...203`)
+sort(unique(aMaizingBL_parent_data$`h1_1...203`), na.last = TRUE)
+
+# This is a calculated field
+```
+
+Drop this column for now.
+
+```{r}
+class(aMaizingBL_parent_data$`h2_1...204`)
+sort(unique(aMaizingBL_parent_data$`h2_1...204`), na.last = TRUE)
+
+# This is a calculated field
+```
+
+Drop this column for now.
+
+```{r}
+class(aMaizingBL_parent_data$h3)
+sort(unique(aMaizingBL_parent_data$h3), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h3 = factor(h3, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h3)
+sort(unique(aMaizingBL_parent_data$h3), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h3_1)
+sort(unique(aMaizingBL_parent_data$h3_1), na.last = TRUE)
+```
+
+Replace -888 with NA.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h3_1 = case_when(
+      h3_1 == -888 ~ NA_real_,
+      TRUE ~ h3_1
+    )
+  )
+
+class(aMaizingBL_parent_data$h3_1)
+sort(unique(aMaizingBL_parent_data$h3_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h4)
+sort(unique(aMaizingBL_parent_data$h4), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h4 = factor(h4, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h4)
+sort(unique(aMaizingBL_parent_data$h4), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h4_1)
+sort(unique(aMaizingBL_parent_data$h4_1), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h4_1 = case_when(
+      h4_1 == -888 ~ NA_real_,
+      TRUE ~ h4_1
+    )
+  )
+
+class(aMaizingBL_parent_data$h4_1)
+sort(unique(aMaizingBL_parent_data$h4_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h5)
+sort(unique(aMaizingBL_parent_data$h5), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h5_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_insuranceno <- paste0("h5_", c(1:12, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_insuranceno <- lapply(colnames_insuranceno, function(col) {
+  
+  # Get the class of the column
+  
+col_class_insuranceno <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_insuranceno <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_insuranceno, sorted_unique_insuranceno = sorted_uv_insuranceno)
+})
+
+# Assign names to the results for clarity
+
+names(results_insuranceno) <- colnames_insuranceno
+
+# Print the results
+
+results_insuranceno
+
+```
+
+`h5_sp` is text type and has not been cleaned.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h5_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_insuranceno <- paste0("h5_", c(1:12, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_insuranceno <- lapply(colnames_insuranceno, function(col) {
+  
+  # Get the class of the column
+  
+col_class_insuranceno <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+  sorted_uv_insuranceno <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+  list(class = col_class_insuranceno, sorted_unique_insuranceno = sorted_uv_insuranceno)
+})
+
+# Assign names to the results for clarity
+
+names(results_insuranceno) <- colnames_insuranceno
+
+# Print the results
+
+results_insuranceno
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h6)
+sort(unique(aMaizingBL_parent_data$h6), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h6 = factor(h6, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h6)
+sort(unique(aMaizingBL_parent_data$h6), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h7)
+sort(unique(aMaizingBL_parent_data$h7), na.last = TRUE)
+
+# multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h7_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h7 <- paste0("h7_", c(1:7, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h7 <- lapply(colnames_h7, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h7 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h7 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h7 = col_class_h7, sorted_unique_h7 = sorted_uv_h7)
+})
+
+# Assign names to the results for clarity
+
+names(results_h7) <- colnames_h7
+
+# Print the results
+
+results_h7
+
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h7_sp = case_when(
+      h7_sp == "Motorbyke insuarance" ~ "Motorbike insurance" ,
+      h7_sp %in% c("Livestock  insurance", "Livestock insuarance") ~ "Livestock insurance",
+      h7_sp == "One acre fund"  ~ "One Acre Fund",
+      
+      TRUE ~ h7_sp
+    )
+    
+    )
+
+#unique(aMaizingBL_parent_data$h7_sp)
+```
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h7_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h7 <- paste0("h7_", c(1:7, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h7 <- lapply(colnames_h7, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h7 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h7 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h7 = col_class_h7, sorted_unique_h7 = sorted_uv_h7)
+})
+
+# Assign names to the results for clarity
+
+names(results_h7) <- colnames_h7
+
+# Print the results
+
+results_h7
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h8)
+sort(unique(aMaizingBL_parent_data$h8), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h8_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h8 <- paste0("h8_", c(1:5, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h8 <- lapply(colnames_h8, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h8 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h8 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h8 = col_class_h8, sorted_unique_h8 = sorted_uv_h8)
+})
+
+# Assign names to the results for clarity
+
+names(results_h8) <- colnames_h8
+
+# Print the results
+
+results_h8
+
+```
+
+`h8_sp` is text; not cleaned.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h8_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h8 <- paste0("h8_", c(1:5, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h8 <- lapply(colnames_h8, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h8 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h8 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h8 = col_class_h8, sorted_unique_h8 = sorted_uv_h8)
+})
+
+# Assign names to the results for clarity
+
+names(results_h8) <- colnames_h8
+
+# Print the results
+
+results_h8
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h9)
+sort(unique(aMaizingBL_parent_data$h9), na.last = TRUE)
+```
+
+1 Strongly trustful 2 Trustful 3 Moderately trustful 4 Untrustful 5 Strongly untrustful
+
+```{r}
+
+h9_trust_levels <- c(
+  
+ "Strongly trustful",	"Trustful",	"Moderately trustful",	"Untrustful", "Strongly untrustful"
+
+                         )  
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h9 = factor(
+      h9, 
+      levels = c(1:5), 
+      labels = h9_trust_levels ,
+      ordered = TRUE
+    )
+  
+  ) 
+
+class(aMaizingBL_parent_data$h9)
+unique(aMaizingBL_parent_data$h9)
+```
+
+***Reverse code h9 and convert to ordinal***
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h9_reversed = factor(
+      h9, 
+     # levels = rev(levels(h9)),  # Reverse the levels while keeping the labels intact
+      levels = rev(levels(h9)) ,  # Reverse the levels
+     # labels = rev(risk_freq_levels),  # Reverse the labels to match reversed levels
+      ordered = TRUE   
+    )
+  )
+
+class(aMaizingBL_parent_data$fh9_reversed)
+unique(aMaizingBL_parent_data$h9_reversed)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h10)
+
+sort(unique(aMaizingBL_parent_data$h10), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h10 = factor(h10, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h10)
+sort(unique(aMaizingBL_parent_data$h10), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h11)
+sort(unique(aMaizingBL_parent_data$h11), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h11_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h11 <- paste0("h11_", c(1:9, "_222"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h11 <- lapply(colnames_h11, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h11 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h11 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h11 = col_class_h11, sorted_unique_h11 = sorted_uv_h11)
+})
+
+# Assign names to the results for clarity
+
+names(results_h11) <- colnames_h11
+
+# Print the results
+
+results_h11
+
+```
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h11_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h11 <- paste0("h11_", c(1:9, "_222"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h11 <- lapply(colnames_h11, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h11 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h11 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h11 = col_class_h11, sorted_unique_h11 = sorted_uv_h11)
+})
+
+# Assign names to the results for clarity
+
+names(results_h11) <- colnames_h11
+
+# Print the results
+
+results_h11
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h12)
+sort(unique(aMaizingBL_parent_data$h12), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h12_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h12_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h12 <- paste0("h12_", c(1:20, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h12 <- lapply(colnames_h12, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h12 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h12 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h12 = col_class_h12, sorted_unique_h12 = sorted_uv_h12)
+})
+
+# Assign names to the results for clarity
+
+names(results_h12) <- colnames_h12
+
+# Print the results
+
+results_h12
+
+```
+
+Drop columns h12_2, h12_5, h12_8, h12_10:h12_12, h12_15:h12_18.
+
+Clean h12_sp
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h12_sp = case_when(
+      h12_sp %in% c("Cigarette", "Tobbacco") ~ "Tobacco", 
+      h12_sp %in% c("Green grams", "Green Grams", "Greengram", "Green  grams", "Greengrams") ~ "Green grams",
+      h12_sp %in% c("Cow piece") ~ "Cowpeas" ,
+      h12_sp %in% c("Cowpeas and green grams", "Greengram, cowpeas") ~ "Cowpeas;Green grams",
+      
+      TRUE ~ h12_sp
+      
+    )
+    
+  )
+```
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h12_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h12 <- paste0("h12_", c(1:20, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h12 <- lapply(colnames_h12, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h12 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h12 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h12 = col_class_h12, sorted_unique_h12 = sorted_uv_h12)
+})
+
+# Assign names to the results for clarity
+
+names(results_h12) <- colnames_h12
+
+# Print the results
+
+results_h12
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h13)
+sort(unique(aMaizingBL_parent_data$h13), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h13 = factor(h13, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h13)
+sort(unique(aMaizingBL_parent_data$h13), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h14)
+sort(unique(aMaizingBL_parent_data$h14), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h14_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h14_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h14 <- paste0("h14_", c(1:20, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h14 <- lapply(colnames_h14, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h14 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h14 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h14 = col_class_h14, sorted_unique_h14 = sorted_uv_h14)
+})
+
+# Assign names to the results for clarity
+
+names(results_h14) <- colnames_h14
+
+# Print the results
+
+results_h14
+
+```
+
+Drop columns h14_2, h14_8, h14_10, h14_12, h14_18.\
+Clean h14_sp.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h14_sp = case_when(
+      h14_sp == "Cow peas" ~ "Cowpeas", 
+      h14_sp == "Tomatos" ~ "Tomatoes" ,
+      h14_sp == "Cowpeas, green grams" ~ "Cowpeas;Green grams" ,
+      TRUE ~ h14_sp
+      
+    )
+    
+  )
+```
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h14_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h14 <- paste0("h14_", c(1:20, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h14 <- lapply(colnames_h14, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h14 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h14 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h14 = col_class_h14, sorted_unique_h14 = sorted_uv_h14)
+})
+
+# Assign names to the results for clarity
+
+names(results_h14) <- colnames_h14
+
+# Print the results
+
+results_h14
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h15)
+sort(unique(aMaizingBL_parent_data$h15), na.last = TRUE)
+```
+
+1 High Probability of crop Failure 2 Value of Crop 3 Cost of input 4 Crop not resistance to Risks -222 Other Specify
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h15 = factor(h15, levels = c(1:4, -222), labels = c("High Probability of crop Failure", "Value of Crop", "Cost of input", "Crop not resistance to Risks", "Other Specify"))
+    
+  )
+
+class(aMaizingBL_parent_data$h15)
+sort(unique(aMaizingBL_parent_data$h15), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h15_sp)
+sort(unique(aMaizingBL_parent_data$h15_sp), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h15_sp = case_when(
+      h15_sp %in% c("Staple food... when you have maize you have food", "Staple food") ~ "Crop is a staple food",
+      
+      h15_sp == "None" ~ NA_character_,
+      
+      TRUE ~ h15_sp
+    )
+  )
+
+
+class(aMaizingBL_parent_data$h15_sp)
+unique(aMaizingBL_parent_data$h15_sp)
+```
+
+Drop h15_sp after replacing in h15
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+
+    h15 = as.character(h15),
+    h15 = str_replace_all(h15, "Other Specify",
+                                              replacement = h15_sp),
+    h15 = factor(h15)
+  )
+
+class(aMaizingBL_parent_data$h15)
+unique(aMaizingBL_parent_data$h15)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h10_1)
+sort(unique(aMaizingBL_parent_data$h10_1), na.last = TRUE)
+```
+
+Replace `2021.00` with NA.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h10_1 = case_when(
+      h10_1 == 2021.00 ~ NA_real_,
+      TRUE ~ h10_1
+    )
+  )
+
+class(aMaizingBL_parent_data$h10_1)
+sort(unique(aMaizingBL_parent_data$h10_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h10_2)
+sort(unique(aMaizingBL_parent_data$h10_2), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h10_2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h10_2_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h10_2 <- paste0("h10_2_", c(1:3, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h10_2 <- lapply(colnames_h10_2, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h10_2 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h10_2 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h10_2 = col_class_h10_2, sorted_unique_h10_2 = sorted_uv_h10_2)
+})
+
+# Assign names to the results for clarity
+
+names(results_h10_2) <- colnames_h10_2
+
+# Print the results
+
+results_h10_2
+
+```
+
+`h10_2_sp` is a text type column; it is not cleaned.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h10_2_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h10_2 <- paste0("h10_2_", c(1:3, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h10_2 <- lapply(colnames_h10_2, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h10_2 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h10_2 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h10_2 = col_class_h10_2, sorted_unique_h10_2 = sorted_uv_h10_2)
+})
+
+# Assign names to the results for clarity
+
+names(results_h10_2) <- colnames_h10_2
+
+# Print the results
+
+results_h10_2
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h16)
+sort(unique(aMaizingBL_parent_data$h16), na.last = TRUE)
+```
+
+1 Inputs 2 Yields 3 Both
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h16 = factor(h16, levels = c(1:3), labels = c("Inputs", "Yields", "Both"))
+    
+  )
+
+class(aMaizingBL_parent_data$h16)
+sort(unique(aMaizingBL_parent_data$h16), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h17)
+sort(unique(aMaizingBL_parent_data$h17), na.last = TRUE)
+```
+
+Replace `-888` with NA.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h17 = case_when(
+      h17 == -888 ~ NA_real_,
+      TRUE ~ h17
+    )
+  )
+
+class(aMaizingBL_parent_data$h17)
+sort(unique(aMaizingBL_parent_data$h17), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h18)
+sort(unique(aMaizingBL_parent_data$h18), na.last = TRUE)
+```
+
+Replace `-888` with NA.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h18 = case_when(
+      h18 == -888 ~ NA_real_,
+      TRUE ~ h18
+    )
+  )
+
+class(aMaizingBL_parent_data$h18)
+sort(unique(aMaizingBL_parent_data$h18), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h19)
+sort(unique(aMaizingBL_parent_data$h19), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h19 = factor(h19, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h19)
+sort(unique(aMaizingBL_parent_data$h19), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h20)
+sort(unique(aMaizingBL_parent_data$h20), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h20 = factor(h20, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h20)
+sort(unique(aMaizingBL_parent_data$h20), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h21)
+sort(unique(aMaizingBL_parent_data$h21), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h21 = factor(h21, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h21)
+sort(unique(aMaizingBL_parent_data$h21), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h22)
+sort(unique(aMaizingBL_parent_data$h22), na.last = TRUE)
+```
+
+1 Not satisfied at all 2 Slight not satisfied 3 Moderately satisfied 4 Satisfied 5 Very satisfied
+
+```{r}
+
+h22_satisfaction_levels <- c(
+  
+ "Not satisfied at all",	"Slight not satisfied", "Moderately satisfied", "Satisfied", "Very satisfied"
+
+                         )  
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h22 = factor(
+      h22, 
+      levels = c(1:5), 
+      labels = h22_satisfaction_levels ,
+      ordered = TRUE
+    )
+  
+  ) 
+
+class(aMaizingBL_parent_data$h22)
+unique(aMaizingBL_parent_data$h22)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h23)
+unique(aMaizingBL_parent_data$h23)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h23 = factor(h23, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h23)
+sort(unique(aMaizingBL_parent_data$h23), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h24)
+sort(unique(aMaizingBL_parent_data$h24), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h24 = factor(h24, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h24)
+sort(unique(aMaizingBL_parent_data$h24), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h25)
+sort(unique(aMaizingBL_parent_data$h25), na.last = TRUE)
+```
+
+***Please confirm the unit for h25***
+
+```{r}
+class(aMaizingBL_parent_data$h26)
+sort(unique(aMaizingBL_parent_data$h26), na.last = TRUE)
+```
+
+Replace `-999 and -888` with NA.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h26 = case_when(
+      h26 %in% c(-999, -888) ~ NA_real_,
+      TRUE ~ h26
+    )
+  )
+
+class(aMaizingBL_parent_data$h26)
+sort(unique(aMaizingBL_parent_data$h26), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h26_1)
+sort(unique(aMaizingBL_parent_data$h26_1), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h26_1 = factor(h26_1, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h26_1)
+sort(unique(aMaizingBL_parent_data$h26_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h26_2)
+sort(unique(aMaizingBL_parent_data$h26_2), na.last = TRUE)
+```
+
+Replace `-888` with NA.
+
+h26_2 is text type column and has not been cleaned.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h26_2 = case_when(
+      h26_2 %in% c(-888) ~ NA_character_,
+      TRUE ~ h26_2
+    )
+  )
+
+class(aMaizingBL_parent_data$h26_2)
+sort(unique(aMaizingBL_parent_data$h26_2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h27)
+sort(unique(aMaizingBL_parent_data$h27), na.last = TRUE)
+```
+
+1 Cash 2 Mobile money 3 Bank transfer 4 Bank loan 5 Online 6 Automatic deduction -222 Other Specify
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h27 = factor(h27, levels = c(1:3, 6, -222), labels = c("Cash", "Mobile money", "Bank transfer", "Automatic deduction",
+                                                        "Other Specify"))
+    
+  )
+
+class(aMaizingBL_parent_data$h27)
+sort(unique(aMaizingBL_parent_data$h27), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h27_sp)
+sort(unique(aMaizingBL_parent_data$h27_sp), na.last = TRUE)
+```
+
+This column is blank; drop it.
+
+```{r}
+class(aMaizingBL_parent_data$h28)
+sort(unique(aMaizingBL_parent_data$h28), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h28 = factor(h28, levels = c(1:3, 6, -222), labels = c("Cash", "Mobile money", "Bank transfer", "Automatic deduction",
+                                                        "Other Specify"))
+    
+  )
+
+class(aMaizingBL_parent_data$h28)
+sort(unique(aMaizingBL_parent_data$h28), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h28_sp)
+sort(unique(aMaizingBL_parent_data$h28_sp), na.last = TRUE)
+```
+
+Drop h28_sp after replacing it in h28.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h28_sp = case_when(
+      h28_sp %in% c("None", "No", "No any other method prefered", "No other method") ~ "No",
+      
+      h28_sp == "Have not yet paid" ~ NA_character_,
+      
+      TRUE ~ h28_sp
+    )
+  )
+
+
+class(aMaizingBL_parent_data$h28_sp)
+unique(aMaizingBL_parent_data$h28_sp)
+```
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+
+    h28 = as.character(h28),
+    h28 = str_replace_all(h28, "Other Specify",
+                                              replacement = h28_sp),
+    h28 = factor(h28)
+  )
+
+class(aMaizingBL_parent_data$h28)
+unique(aMaizingBL_parent_data$h28)
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h29)
+sort(unique(aMaizingBL_parent_data$h29), na.last = TRUE)
+```
+
+1 Agrovet 2 School 3 Church 4 Farmer group meeting 5 Town center -222 Other Specify
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h29 = factor(h29, levels = c(1:5, -222), labels = c("Agrovet", "School", "Church", "Farmer group meeting",  "Town center",
+                                                        "Other Specify"))
+    
+  )
+
+class(aMaizingBL_parent_data$h29)
+sort(unique(aMaizingBL_parent_data$h29), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h29_sp)
+sort(unique(aMaizingBL_parent_data$h29_sp), na.last = TRUE)
+```
+
+h29_sp is text type column; it is not cleaned.
+
+```{r}
+class(aMaizingBL_parent_data$h30)
+sort(unique(aMaizingBL_parent_data$h30), na.last = TRUE)
+```
+
+1 Very inconvenient 2 Inconvenient 3 Moderately convenient 4 Convenient 5 Very convenient
+
+```{r}
+
+h30_convenient_levels <- c(
+  
+ "Very inconvenient",	"Inconvenient", "Moderately convenient", "Convenient", "Very convenient"
+
+                         )  
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h30 = factor(
+      h30, 
+      levels = c(1:5), 
+      labels = h30_convenient_levels ,
+      ordered = TRUE
+    )
+  
+  ) 
+
+class(aMaizingBL_parent_data$h30)
+unique(aMaizingBL_parent_data$h30)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h31)
+unique(aMaizingBL_parent_data$h31)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h31 = factor(h31, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h31)
+sort(unique(aMaizingBL_parent_data$h31), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h32)
+sort(unique(aMaizingBL_parent_data$h32), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h10_2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h32_")) %>%
+  names()
+```
+
+h32 1 Weather advisory h32 2 Input loan h32 3 Good Agricultural Practices. h32 4 Other Specify.
+
+```{r}
+# Create a vector of column names 
+
+colnames_h32 <- paste0("h32_", c(1:4, "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h32 <- lapply(colnames_h32, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h32 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h32 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h32 = col_class_h32, sorted_unique_h32 = sorted_uv_h32)
+})
+
+# Assign names to the results for clarity
+
+names(results_h32) <- colnames_h32
+
+# Print the results
+
+results_h32
+
+```
+
+`h32_sp` is blank; drop the column.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h32_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h32 <- paste0("h32_", c(1:4, "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h32 <- lapply(colnames_h32, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h32 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h32 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h32 = col_class_h32, sorted_unique_h32 = sorted_uv_h32)
+})
+
+# Assign names to the results for clarity
+
+names(results_h32) <- colnames_h32
+
+# Print the results
+
+results_h32
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h33)
+sort(unique(aMaizingBL_parent_data$h33), na.last = TRUE)
+```
+
+***`h33` was programmed as select multiple, but was supposed to be select_one question type.***
+
+1 Not helpful at all 2 Slightly not helpful 3 Moderately not helpful 4 Helpful 5 Very helpful
+
+```{r}
+
+h33_helpful_levels <- c(
+  
+ "Not helpful at all",	"Slightly not helpful", "Moderately not helpful", "Helpful", "Very helpful"
+
+                         )  
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h33 = factor(
+      h33, 
+      levels = c(1:5), 
+      labels = h33_helpful_levels ,
+      ordered = TRUE
+    )
+  
+  ) 
+
+class(aMaizingBL_parent_data$h33)
+unique(aMaizingBL_parent_data$h33)
+```
+
+```{r}
+
+# Obtain names of columns starting with "h10_2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h33_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h33 <- paste0("h33_", c(1:5))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h33 <- lapply(colnames_h33, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h33 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h33 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h33 = col_class_h33, sorted_unique_h33 = sorted_uv_h33)
+})
+
+# Assign names to the results for clarity
+
+names(results_h33) <- colnames_h33
+
+# Print the results
+
+results_h33
+
+```
+
+***Drop columns starting with `h33_`***
+
+```{r}
+class(aMaizingBL_parent_data$h34)
+unique(aMaizingBL_parent_data$h34)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h34 = factor(h34, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h34)
+sort(unique(aMaizingBL_parent_data$h34), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h35)
+sort(unique(aMaizingBL_parent_data$h35), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h35 = factor(h35, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h35)
+sort(unique(aMaizingBL_parent_data$h35), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h36)
+sort(unique(aMaizingBL_parent_data$h36), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h36 = factor(h36, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h36)
+sort(unique(aMaizingBL_parent_data$h36), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h37)
+sort(unique(aMaizingBL_parent_data$h37), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h10_2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h37_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h37 <- paste0("h37_", c(1:20, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h37 <- lapply(colnames_h37, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h37 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h37 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h37 = col_class_h37, sorted_unique_h37 = sorted_uv_h37)
+})
+
+# Assign names to the results for clarity
+
+names(results_h37) <- colnames_h37
+
+# Print the results
+
+results_h37
+
+```
+
+The following columns are blank; drop them: h37_2, h37_3, h37_6, h37_8, h37_9:h37_12, h37_14:h37_19, h37_sp.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h37_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h37 <- paste0("h37_", c(1:20, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h37 <- lapply(colnames_h37, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h37 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h37 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h37 = col_class_h37, sorted_unique_h37 = sorted_uv_h37)
+})
+
+# Assign names to the results for clarity
+
+names(results_h37) <- colnames_h37
+
+# Print the results
+
+results_h37
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h38)
+sort(unique(aMaizingBL_parent_data$h38), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h38 = factor(h38, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h38)
+sort(unique(aMaizingBL_parent_data$h38), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h39)
+sort(unique(aMaizingBL_parent_data$h39), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h39_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h39_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h39 <- paste0("h39_", c(1:20, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h39 <- lapply(colnames_h39, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h39 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h39 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h39 = col_class_h39, sorted_unique_h39 = sorted_uv_h39)
+})
+
+# Assign names to the results for clarity
+
+names(results_h39) <- colnames_h39
+
+# Print the results
+
+results_h39
+
+```
+
+h39_20 = Vegetables, from the questionnaire. Mutate h39_20 = 1, when h39_sp == "Local vegetables".\
+Clean h39_sp.
+
+```{r}
+table(aMaizingBL_parent_data$h39_20)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h39_20 = case_when(
+      h39_sp == "Local vegetables" ~ 1,
+      TRUE ~ h39_20
+    ),
+    
+    h39_sp = str_replace_all(h39_sp, "Tomatoes and onions", "Tomatoes;Onions"),
+    h39_sp = str_replace_all(h39_sp, "Local vegetables", NA_character_)
+  )
+
+table(aMaizingBL_parent_data$h39_20)
+
+unique(aMaizingBL_parent_data$h39_sp)
+```
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h39_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h39 <- paste0("h39_", c(1:20, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h39 <- lapply(colnames_h39, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h39 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h39 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h39 = col_class_h39, sorted_unique_h39 = sorted_uv_h39)
+})
+
+# Assign names to the results for clarity
+
+names(results_h39) <- colnames_h39
+
+# Print the results
+
+results_h39
+
+```
+
+Drop columns h39_2, h39_6, h39_8, h39_10, h39_12, h39_13, h39_15, h39_16, h39_18; they have zeros only.
+
+```{r}
+class(aMaizingBL_parent_data$h40)
+sort(unique(aMaizingBL_parent_data$h40), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h40 = factor(h40, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h40)
+sort(unique(aMaizingBL_parent_data$h40), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h41)
+sort(unique(aMaizingBL_parent_data$h41), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h41 = factor(h41, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h41)
+sort(unique(aMaizingBL_parent_data$h41), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h42)
+sort(unique(aMaizingBL_parent_data$h42), na.last = TRUE)
+```
+
+1 Very few or none 2 Some 3 Many 4 Almost all 0 I cannot recall
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h42 = factor(h42, levels = c(0:4), labels = c("I cannot recall", "Very few or none", "Some", "Many", "Almost all"), ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h42)
+sort(unique(aMaizingBL_parent_data$h42), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h43)
+sort(unique(aMaizingBL_parent_data$h43), na.last = TRUE)
+```
+
+1 Very difficult 2 Difficult 3 Moderate ease 4 Easy 5 Very easy
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h43 = factor(h43, levels = c(1:5), labels = c("Very difficult", "Difficult", "Moderate ease", "Easy", "Very easy"), ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h43)
+sort(unique(aMaizingBL_parent_data$h43), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h44)
+sort(unique(aMaizingBL_parent_data$h44), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "h44_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h44_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h44 <- paste0("h44_", c(1:10, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h44 <- lapply(colnames_h44, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h44 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h44 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h44 = col_class_h44, sorted_unique_h44 = sorted_uv_h44)
+})
+
+# Assign names to the results for clarity
+
+names(results_h44) <- colnames_h44
+
+# Print the results
+
+results_h44
+
+```
+
+h44_sp is character type column and has not been cleaned.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("h44_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_h44 <- paste0("h44_", c(1:10, "_222", "sp"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_h44 <- lapply(colnames_h44, function(col) {
+  
+  # Get the class of the column
+  
+col_class_h44 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_h44 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_h44 = col_class_h44, sorted_unique_h44 = sorted_uv_h44)
+})
+
+# Assign names to the results for clarity
+
+names(results_h44) <- colnames_h44
+
+# Print the results
+
+results_h44
+
+```
+
+```{r}
+
+# Mutate a blank column h45 = To what extent do you agree with the following statement?
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(h45 = NA)  
+
+```
+
+```{r}
+# Obtain names of columns starting with "h45_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h45_")) %>%
+  names()
+```
+
+```{r}
+# Checking class and unique values for h45_1:h45_8
+
+lapply(aMaizingBL_parent_data %>% 
+         select(h45_1:h45_8), function(x) {
+  list(
+    class = class(x),
+    unique_sorted = sort(unique(x), na.last = TRUE)
+  )
+})
+
+```
+
+1 Strongly Agree\
+2 Agree\
+3 Undecided\
+4 Disagree\
+5 Strongly disagree
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  
+# Replace -888 with NA_real_ for h45_1:h45_8
+  
+  mutate(across(
+    h45_1:h45_8, 
+    ~ case_when(
+      . == -888 ~ NA_real_,
+      TRUE ~ .
+    )
+  )) %>%
+  
+# Convert h45_1:h45_8 to ordered factors with labels
+  
+  mutate(across(
+    h45_1:h45_8,
+    ~ factor(., levels = c(1:5), labels = c("Strongly Agree", "Agree", "Undecided", "Disagree", "Strongly disagree"), ordered = TRUE)
+  )) %>%
+  
+# Reverse-code h45_1:h45_8 and creates new columns with "_reversed"
+  
+ mutate(across(
+    h45_1:h45_8,
+    ~ factor(., levels = rev(levels(.)), ordered = TRUE),
+    .names = "{.col}_reversed"  
+  ))
+
+# Check the class and sorted unique values for h45_1_reversed:h45_8_reversed
+
+lapply(aMaizingBL_parent_data %>% select(h45_1_reversed:h45_8_reversed), class)
+lapply(aMaizingBL_parent_data %>% select(h45_1_reversed:h45_8_reversed), function(x) sort(unique(x), na.last = TRUE))
+
+```
+
+```{r}
+
+# Mutate a blank column h46 = To what extent do you agree with the following statement? (For people that have ever used)
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(h46 = NA)  
+
+```
+
+```{r}
+# Obtain names of columns starting with "h46_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("h46_")) %>%
+  names()
+```
+
+```{r}
+# Checking class and unique values for h46_1:h45_13
+
+lapply(aMaizingBL_parent_data %>% 
+         select(h46_1:h46_13), function(x) {
+  list(
+    class = class(x),
+    unique_sorted = sort(unique(x), na.last = TRUE)
+  )
+})
+
+```
+
+1 Strongly Agree\
+2 Agree\
+3 Undecided\
+4 Disagree\
+5 Strongly disagree\
+-888 Don’t know
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  
+# Replace -888 with NA_real_ for h46_1:h46_13
+  
+  mutate(across(
+    h46_1:h46_13, 
+    ~ case_when(
+      . == -888 ~ NA_real_,
+      TRUE ~ .
+    )
+  )) %>%
+  
+# Convert h46_1:h46_13 to ordered factors with labels
+  
+  mutate(across(
+    h46_1:h46_13,
+    ~ factor(., levels = c(1:5), labels = c("Strongly Agree", "Agree", "Undecided", "Disagree", "Strongly disagree"), ordered = TRUE)
+  )) %>%
+  
+# Reverse-code h46_1:h46_13 and creates new columns with "_reversed"
+  
+ mutate(across(
+    h46_1:h46_13,
+    ~ factor(., levels = rev(levels(.)), ordered = TRUE),
+    .names = "{.col}_reversed"  
+  ))
+
+# Check the class and sorted unique values for h46_1_reversed:h46_13_reversed
+
+lapply(aMaizingBL_parent_data %>% select(h46_1_reversed:h46_13_reversed), class)
+lapply(aMaizingBL_parent_data %>% select(h46_1_reversed:h46_13_reversed), function(x) sort(unique(x), na.last = TRUE))
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_1)
+sort(unique(aMaizingBL_parent_data$h47_1), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h47_1 = factor(h47_1, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h47_1)
+sort(unique(aMaizingBL_parent_data$h47_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_2)
+sort(unique(aMaizingBL_parent_data$h47_2), na.last = TRUE)
+```
+
+h47_2 1 Yes, more likely\
+h47_2 2 No, not more likely\
+h47_2 3 No opinion ***Replace with NA***
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h47_2 = case_when(
+      h47_2 == 3 ~ NA_real_, # Replace h47_2 == 3 with NA
+      
+      TRUE ~ h47_2
+    ),
+    
+    h47_2 = factor(h47_2, levels = c(1,2), labels = c("Yes, more likely", "No, not more likely"), ordered = TRUE),
+
+# Reverse-code h47_2    
+    
+    h47_2_reversed = factor(
+      h47_2, 
+      levels = rev(levels(h47_2)) ,  # Reverse the levels
+      ordered = TRUE   
+    )
+   
+  )
+
+class(aMaizingBL_parent_data$h47_2)
+sort(unique(aMaizingBL_parent_data$h47_2), na.last = TRUE)
+
+class(aMaizingBL_parent_data$h47_2_reversed)
+sort(unique(aMaizingBL_parent_data$h47_2_reversed), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_3)
+sort(unique(aMaizingBL_parent_data$h47_3), na.last = TRUE)
+```
+
+1 Yes, more likely\
+2 No, not more likely\
+3 No opinion
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h47_3 = case_when(
+      h47_3 == 3 ~ NA_real_, # Replace h47_3 == 3 with NA
+      
+      TRUE ~ h47_3
+    ),
+    
+    h47_3 = factor(h47_3, levels = c(1,2), labels = c("Yes, more likely", "No, not more likely"), ordered = TRUE),
+
+# Reverse-code h47_3    
+    
+    h47_3_reversed = factor(
+      h47_3, 
+      levels = rev(levels(h47_3)) ,  # Reverse the levels
+      ordered = TRUE   
+    )
+   
+  )
+
+class(aMaizingBL_parent_data$h47_3)
+sort(unique(aMaizingBL_parent_data$h47_3), na.last = TRUE)
+
+class(aMaizingBL_parent_data$h47_3_reversed)
+sort(unique(aMaizingBL_parent_data$h47_3_reversed), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_4)
+sort(unique(aMaizingBL_parent_data$h47_4), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h47_4 = factor(h47_4, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h47_4)
+sort(unique(aMaizingBL_parent_data$h47_4), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_5)
+sort(unique(aMaizingBL_parent_data$h47_5), na.last = TRUE)
+```
+
+h47_5 1 Yes, it made it more affordable\
+h47_5 2 No, it did not make it more affordable\
+h47_5 3 Not applicable
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h47_5 = case_when(
+      h47_5 == 3 ~ NA_real_, # Replace h47_5 == 3 with NA
+      
+      TRUE ~ h47_5
+    ),
+    
+    h47_5 = factor(h47_5, levels = c(1,2), labels = c("Yes, it made it more affordable", "No, it did not make it more affordable"), ordered = TRUE),
+
+# Reverse-code h47_5    
+    
+    h47_5_reversed = factor(
+      h47_5, 
+      levels = rev(levels(h47_5)) ,  # Reverse the levels
+      ordered = TRUE   
+    )
+   
+  )
+
+class(aMaizingBL_parent_data$h47_5)
+sort(unique(aMaizingBL_parent_data$h47_5), na.last = TRUE)
+
+class(aMaizingBL_parent_data$h47_5_reversed)
+sort(unique(aMaizingBL_parent_data$h47_5_reversed), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_6)
+sort(unique(aMaizingBL_parent_data$h47_6), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h47_6 = factor(h47_6, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h47_6)
+sort(unique(aMaizingBL_parent_data$h47_6), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_7)
+sort(unique(aMaizingBL_parent_data$h47_7), na.last = TRUE)
+```
+
+h47_7 1 Yes, willing to pay more h47_7 2 No, not willing to pay more h47_7 3 No opinion
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h47_7 = case_when(
+      h47_7 == 3 ~ NA_real_, # Replace h47_7 == 3 with NA
+      
+      TRUE ~ h47_7
+    ),
+    
+    h47_7 = factor(h47_7, levels = c(1,2), labels = c("Yes, willing to pay more", "No, not willing to pay more"), ordered = TRUE),
+
+# Reverse-code h47_7    
+    
+    h47_7_reversed = factor(
+      h47_7, 
+      levels = rev(levels(h47_7)) ,  # Reverse the levels
+      ordered = TRUE   
+    )
+   
+  )
+
+class(aMaizingBL_parent_data$h47_7)
+sort(unique(aMaizingBL_parent_data$h47_7), na.last = TRUE)
+
+class(aMaizingBL_parent_data$h47_7_reversed)
+sort(unique(aMaizingBL_parent_data$h47_7_reversed), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_8)
+sort(unique(aMaizingBL_parent_data$h47_8), na.last = TRUE)
+```
+
+h47_8 1 Yes, I would recommend it\
+h47_8 2 No, I would not recommend it\
+h47_8 3 Not sure
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h47_8 = case_when(
+      h47_8 == 3 ~ NA_real_, # Replace h47_8 == 3 with NA
+      
+      TRUE ~ h47_8
+    ),
+    
+    h47_8 = factor(h47_8, levels = c(1,2), labels = c("Yes, willing to pay more", "No, not willing to pay more"), ordered = TRUE),
+
+# Reverse-code h47_8    
+    
+    h47_8_reversed = factor(
+      h47_8, 
+      levels = rev(levels(h47_8)) ,  # Reverse the levels
+      ordered = TRUE   
+    )
+   
+  )
+
+class(aMaizingBL_parent_data$h47_8)
+sort(unique(aMaizingBL_parent_data$h47_8), na.last = TRUE)
+
+class(aMaizingBL_parent_data$h47_8_reversed)
+sort(unique(aMaizingBL_parent_data$h47_8_reversed), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_9)
+sort(unique(aMaizingBL_parent_data$h47_9), na.last = TRUE)
+```
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h47_9 = factor(h47_9, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h47_9)
+sort(unique(aMaizingBL_parent_data$h47_9), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_10)
+sort(unique(aMaizingBL_parent_data$h47_10), na.last = TRUE)
+```
+
+h47_10 1 Yes, very comfortable\
+h47_10 2 Somewhat comfortable\
+h47_10 3 Not comfortable
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h47_10 = factor(h47_10, levels = c(1:3), labels = c("Yes, very comfortable", "Somewhat comfortable", "Not comfortable"), ordered = TRUE),
+
+# Reverse-code h47_10    
+    
+    h47_10_reversed = factor(
+      h47_10, 
+      levels = rev(levels(h47_10)) ,  # Reverse the levels
+      ordered = TRUE   
+    )
+   
+  )
+
+class(aMaizingBL_parent_data$h47_10)
+sort(unique(aMaizingBL_parent_data$h47_10), na.last = TRUE)
+
+class(aMaizingBL_parent_data$h47_10_reversed)
+sort(unique(aMaizingBL_parent_data$h47_10_reversed), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_11)
+sort(unique(aMaizingBL_parent_data$h47_11), na.last = TRUE)
+```
+
+h47_11 1 Digital deliveries h47_11 2 In-person visits h47_11 3 Both
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h47_11 = factor(h47_11, levels = c(1:3), labels = c("Digital deliveries", "In-person visits", "Both")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$h47_11)
+sort(unique(aMaizingBL_parent_data$h47_11), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_12)
+sort(unique(aMaizingBL_parent_data$h47_12), na.last = TRUE)
+```
+
+h47_12 1 Better\
+h47_12 2 Worse\
+h47_12 3 Same\
+h47_12 4 Not sure ***Replace with NA***
+
+Mutate `h47_12` so that `3 = Better, 2 = Same, 1 = Worse`
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h47_12 = case_when(
+      h47_12 == 4 ~ NA_real_, # Replace h47_12 == 4 with NA
+      
+      TRUE ~ h47_12
+    ),
+    
+    h47_12 = factor(h47_12, levels = c(1:3), labels = c("Better", "Worse", "Same")) #, ordered = TRUE),
+  )
+    
+ table(aMaizingBL_parent_data$h47_12)  
+
+```
+
+```{r}
+# Mutate `h47_12` so that `3 = Better, 2 = Same, 1 = Worse
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    h47_12 = as.character(h47_12),
+    
+    h47_12 = case_when(
+      h47_12 == "Better"   ~ "3",
+      h47_12 == "Same" ~ "2",
+      h47_12 == "Worse" ~ "1",
+      
+      TRUE ~ h47_12
+    ),
+    
+    h47_12 = as.numeric(h47_12),
+    
+    h47_12 = factor(h47_12, levels = c(1:3), labels = c("Worse", "Same", "Better"), ordered = TRUE),
+    )
+
+class(aMaizingBL_parent_data$h47_12)
+
+sort(unique(aMaizingBL_parent_data$h47_12), na.last = TRUE)
+
+table(aMaizingBL_parent_data$h47_12)  
+ 
+```
+
+```{r}
+class(aMaizingBL_parent_data$h47_13)
+sort(unique(aMaizingBL_parent_data$h47_13), na.last = TRUE)
+```
+
+h47_13 1 Yes, I would recommend them\
+h47_13 2 No, I would not recommend them\
+h47_13 3 Not sure remains
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    h47_13 = case_when(
+      h47_13 == 3 ~ NA_real_, # Replace h47_13 == 3 with NA
+      
+      TRUE ~ h47_13
+    ),
+    
+    h47_13 = factor(h47_13, levels = c(1,2), labels = c("Yes, I would recommend them", "No, I would not recommend them"), ordered = TRUE),
+
+# Reverse-code h47_13    
+    
+    h47_13_reversed = factor(
+      h47_13, 
+      levels = rev(levels(h47_13)) ,  # Reverse the levels
+      ordered = TRUE   
+    )
+   
+  )
+
+class(aMaizingBL_parent_data$h47_13)
+sort(unique(aMaizingBL_parent_data$h47_13), na.last = TRUE)
+
+class(aMaizingBL_parent_data$h47_13_reversed)
+sort(unique(aMaizingBL_parent_data$h47_13_reversed), na.last = TRUE)
+```
+
+Drop `"end_insurance", "time_insurance", and "start_climate"`
+
+```{r}
+class(aMaizingBL_parent_data$i0)
+sort(unique(aMaizingBL_parent_data$i0), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    i0 = factor(i0, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$i0)
+sort(unique(aMaizingBL_parent_data$i0), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$i1)
+sort(unique(aMaizingBL_parent_data$i1), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "i1_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("i1_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_i1 <- paste0("i1_", c(1:14, "_222", "_2222", "sp", "sp1"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_i1 <- lapply(colnames_i1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_i1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_i1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_i1 = col_class_i1, sorted_unique_i1 = sorted_uv_i1)
+})
+
+# Assign names to the results for clarity
+
+names(results_i1) <- colnames_i1
+
+# Print the results
+
+results_i1
+
+```
+
+`i1_sp1` is blank; drop it.\
+Replace `"-999"` in `i1_sp` with NA.\
+`i1_sp` is text type column; it has not been cleaned.
+
+```{r}
+
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  
+  mutate(
+    i1_sp = case_when(
+      i1_sp == "-999" ~ NA_character_,
+      
+      TRUE ~ i1_sp
+    )
+  )
+
+```
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("i1_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_i1 <- paste0("i1_", c(1:14, "_222", "_2222", "sp", "sp1"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_i1 <- lapply(colnames_i1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_i1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_i1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_i1 = col_class_i1, sorted_unique_i1 = sorted_uv_i1)
+})
+
+# Assign names to the results for clarity
+
+names(results_i1) <- colnames_i1
+
+# Print the results
+
+results_i1
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$rp_climate_info_count)
+sort(unique(aMaizingBL_parent_data$rp_climate_info_count), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rp_climate_info_count = as.integer(rp_climate_info_count)
+  )
+
+class(aMaizingBL_parent_data$rp_climate_info_count)
+sort(unique(aMaizingBL_parent_data$rp_climate_info_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rp_climate_info`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rp_climate_info`), na.last = TRUE)
+
+# This is an ID column
+```
+
+Mutate `i7 = If you are receiving weather information and agro-advisory services, how much do you pay per month`
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(i7 = NA)
+
+class(aMaizingBL_parent_data$i7)
+```
+
+```{r}
+class(aMaizingBL_parent_data$i7_1)
+sort(unique(aMaizingBL_parent_data$i7_1), na.last = TRUE)
+```
+
+Replace `-888.0 and 888.0` with NA.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    i7_1 = case_when(
+      
+      i7_1 == -888.0 ~ NA_real_,
+      
+      i7_1 == 888.0 ~ NA_real_,
+      
+      TRUE ~ i7_1
+    )
+  )
+
+class(aMaizingBL_parent_data$i7_1)
+sort(unique(aMaizingBL_parent_data$i7_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$i7_2)
+sort(unique(aMaizingBL_parent_data$i7_2), na.last = TRUE)
+```
+
+Replace `-888.0 and 888.0` with NA.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    i7_2 = case_when(
+      
+      i7_2 == -888.0 ~ NA_real_,
+      
+      i7_1 == 888.0 ~ NA_real_,
+      
+      TRUE ~ i7_2
+    )
+  )
+
+class(aMaizingBL_parent_data$i7_2)
+sort(unique(aMaizingBL_parent_data$i7_2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$i7_3)
+sort(unique(aMaizingBL_parent_data$i7_3), na.last = TRUE)
+```
+
+Replace `-888.0 and 888.0` with NA.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    i7_3 = case_when(
+      
+      i7_3 == -888.0 ~ NA_real_,
+      
+      i7_3 == 888.0 ~ NA_real_,
+      
+      TRUE ~ i7_3
+    )
+  )
+
+class(aMaizingBL_parent_data$i7_3)
+sort(unique(aMaizingBL_parent_data$i7_3), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$i8)
+sort(unique(aMaizingBL_parent_data$i8), na.last = TRUE)
+```
+
+1 Good 2 Moderate 3 Bad
+
+```{r}
+
+i8_good_levels <- c( "Good",	"Moderate",	"Bad")  
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    i8 = factor(
+      i8, 
+      levels = c(1:3), 
+      labels = i8_good_levels ,
+      ordered = TRUE
+    )
+  
+  ) 
+
+class(aMaizingBL_parent_data$i8)
+unique(aMaizingBL_parent_data$i8)
+```
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    i8_reversed = factor(
+      i8, 
+      levels = rev(levels(i8)) ,  # Reverse the levels
+      ordered = TRUE   
+    )
+  )
+
+class(aMaizingBL_parent_data$i8_reversed)
+unique(aMaizingBL_parent_data$i8_reversed)
+```
+
+```{r}
+class(aMaizingBL_parent_data$i9)
+unique(aMaizingBL_parent_data$i9)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    i9 = factor(i9, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$i9)
+sort(unique(aMaizingBL_parent_data$i9), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$i10)
+sort(unique(aMaizingBL_parent_data$i10), na.last = TRUE)
+```
+
+1 Yes 0 No -888 Don’t Know ***Replace with NA***
+
+Convert i10 to factor.
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    
+    i10 = case_when(
+      
+      i10 == -888 ~ NA_real_,
+      
+      TRUE ~ i10
+    ),
+    
+    i10 = factor(i10, levels = c(0, 1), labels = c("No", "Yes"))
+  )
+
+class(aMaizingBL_parent_data$i10)
+sort(unique(aMaizingBL_parent_data$i10), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$i11)
+sort(unique(aMaizingBL_parent_data$i11), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    i11 = factor(i11, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$i11)
+sort(unique(aMaizingBL_parent_data$i11), na.last = TRUE)
+```
+
+```{r}
+
+class(aMaizingBL_parent_data$i12)
+sort(unique(aMaizingBL_parent_data$i12), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("i12_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_i12 <- paste0("i12_", c(1:30, 100,  "_222", "_2222", "sp", "sp1"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_i12 <- lapply(colnames_i12, function(col) {
+  
+  # Get the class of the column
+  
+col_class_i12 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_i12 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_i12 = col_class_i12, sorted_unique_i12 = sorted_uv_i12)
+})
+
+# Assign names to the results for clarity
+
+names(results_i12) <- colnames_i12
+
+# Print the results
+
+results_i12
+
+```
+
+`i12_sp and i12_sp1` are text type questions and have not been cleaned.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("i12  _"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_i12 <- paste0("i12_", c(1:30, 100,  "_222", "_2222", "sp", "sp1"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_i12 <- lapply(colnames_i12, function(col) {
+  
+  # Get the class of the column
+  
+col_class_i12 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_i12 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_i12 = col_class_i12, sorted_unique_i12 = sorted_uv_i12)
+})
+
+# Assign names to the results for clarity
+
+names(results_i12) <- colnames_i12
+
+# Print the results
+
+results_i12
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$rp_csa_practices_count)
+sort(unique(aMaizingBL_parent_data$rp_csa_practices_count), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rp_csa_practices_count = as.integer(rp_csa_practices_count)
+  )
+
+class(aMaizingBL_parent_data$rp_csa_practices_count)
+sort(unique(aMaizingBL_parent_data$rp_csa_practices_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rp_csa_practices`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rp_csa_practices`), na.last = TRUE)
+
+# ID column
+```
+
+```{r}
+# Mutate i20 = CSA Practices Perception
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    i20 = NA
+  )
+
+```
+
+```{r}
+# Obtain names of columns starting with "h45_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("i20_")) %>%
+  names()
+```
+
+```{r}
+# Checking class and unique values for i20_1:i20_4
+
+lapply(aMaizingBL_parent_data %>% 
+         select(i20_1:i20_4), function(x_i20) {
+  list(
+    class = class(x_i20),
+    unique_sorted = sort(unique(x_i20), na.last = TRUE)
+  )
+})
+
+```
+
+1 Agree 2 Neutral 3 Disagree
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  
+# Convert i20_1:i20_4 to ordered factors with labels
+  
+  mutate(across(
+    i20_1:i20_4,
+    ~ factor(., levels = c(1:3), labels = c("Agree", "Neutral", "Disagree"), ordered = TRUE)
+  )) %>%
+  
+# Reverse-code i20_1:i20_4 and creates new columns with "_reversed"
+  
+ mutate(across(
+    i20_1:i20_4,
+    ~ factor(., levels = rev(levels(.)), ordered = TRUE),
+    .names = "{.col}_reversed"  
+  ))
+
+# Check the class and sorted unique values for i20_1_reversed:i20_4_reversed
+
+lapply(aMaizingBL_parent_data %>% select(i20_1_reversed:i20_4_reversed), class)
+lapply(aMaizingBL_parent_data %>% select(i20_1_reversed:i20_4_reversed), function(x) sort(unique(x), na.last = TRUE))
+
+```
+
+\*\*\*Drop columns `"end_climate", "time_climate", "start_assets"`
+
+```{r}
+class(aMaizingBL_parent_data$j1)
+#sort(unique(aMaizingBL_parent_data$j1), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("j1_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_j1 <- paste0("j1_", c(1:39, "_222", "_221", "_223",  "sp1", "sp2", "sp3"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_j1 <- lapply(colnames_j1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_j1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_j1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_j1 = col_class_j1, sorted_unique_j1 = sorted_uv_j1)
+})
+
+# Assign names to the results for clarity
+
+names(results_j1) <- colnames_j1
+
+# Print the results
+
+results_j1
+
+```
+
+j1_sp1 and j1_sp2 are text and have not been cleaned.
+
+Drop j1_sp3; it is blank.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("j1_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_j1 <- paste0("j1_", c(1:39, "_222", "_221", "_223",  "sp1", "sp2", "sp3"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_j1 <- lapply(colnames_j1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_j1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_j1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_j1 = col_class_j1, sorted_unique_j1 = sorted_uv_j1)
+})
+
+# Assign names to the results for clarity
+
+names(results_j1) <- colnames_j1
+
+# Print the results
+
+results_j1
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$rpf_count)
+sort(unique(aMaizingBL_parent_data$rpf_count), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rpf_count = as.integer(rpf_count)
+  )
+
+class(aMaizingBL_parent_data$rpf_count)
+sort(unique(aMaizingBL_parent_data$rpf_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rpf`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rpf`), na.last = TRUE)
+
+# ID column
+```
+
+Drop `"end_assets"  and "time_assets"`
+
+```{r}
+class(aMaizingBL_parent_data$k0_1)
+sort(unique(aMaizingBL_parent_data$k0_1), na.last = TRUE)
+
+
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    k0_1 = factor(k0_1, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$k0_1)
+sort(unique(aMaizingBL_parent_data$k0_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$k0_2)
+sort(unique(aMaizingBL_parent_data$k0_2), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    k0_2 = factor(k0_2, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$k0_2)
+sort(unique(aMaizingBL_parent_data$k0_2), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$k1)
+sort(unique(aMaizingBL_parent_data$k1), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("k1_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_k1 <- paste0("k1_", c(1:8, "_222", "_221", "_223", "_100", "sp1", "sp2", "sp3"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_k1 <- lapply(colnames_k1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_k1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_k1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_k1 = col_class_k1, sorted_unique_k1 = sorted_uv_k1)
+})
+
+# Assign names to the results for clarity
+
+names(results_k1) <- colnames_k1
+
+# Print the results
+
+results_k1
+
+```
+
+1 Crop Insurance\
+2 Non-governmental organization (NGO)\
+3 Formal lender (bank/financial institution/ Agricultural Finance Cooperation)\
+4 Informal lender (e.g Shylock)\
+5 Friends or relatives\
+6 Group based micro-finance or lending including VSLAs / SACCOs\
+7 Informal credit / savings groups (e.g., merry-go-rounds, funeral societies, etc.)\
+8 Mobile loans\
+-222 Other Specify 1\
+-221 Other Specify 2\
+-223 Other Specify 3\
+-100 Not Applicable ***Drop this column***
+
+`k1_sp1` is text type columns and has not been cleaned.\
+`k1_sp2 and k1_sp3` are blank; drop these columns.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("k1_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_k1 <- paste0("k1_", c(1:8, "_222", "_221", "_223", "_100", "sp1", "sp2", "sp3"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_k1 <- lapply(colnames_k1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_k1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_k1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_k1 = col_class_k1, sorted_unique_k1 = sorted_uv_k1)
+})
+
+# Assign names to the results for clarity
+
+names(results_k1) <- colnames_k1
+
+# Print the results
+
+results_k1
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$rp_finance_count)
+sort(unique(aMaizingBL_parent_data$rp_finance_count), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rp_finance_count = as.integer(rp_finance_count)
+  )
+
+class(aMaizingBL_parent_data$rp_finance_count)
+sort(unique(aMaizingBL_parent_data$rp_finance_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rp_finance`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rp_finance`), na.last = TRUE)
+
+# ID column
+```
+
+```{r}
+class(aMaizingBL_parent_data$l1)
+sort(unique(aMaizingBL_parent_data$l1), na.last = TRUE)
+
+# Multi-select
+```
+
+```{r}
+
+# Obtain names of columns starting with "_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("l1_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_l1 <- paste0("l1_", c(1:8, "_222", "_221", "_223", "_100", "sp1", "sp2", "sp3"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_l1 <- lapply(colnames_l1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_l1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_l1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_l1 = col_class_l1, sorted_unique_l1 = sorted_uv_l1)
+})
+
+# Assign names to the results for clarity
+
+names(results_l1) <- colnames_l1
+
+# Print the results
+
+results_l1
+
+```
+
+1 Agricultural / livestock / fisheries producer’s group (including marketing groups)\
+2 Water users’ group\
+3 Forest users’ group\
+4 Credit or microfinance group (including SACCOs / merry-go-rounds / VSLAs)\
+5 Mutual help or insurance group (including burial societies)\
+6 Trade and business association group\
+7 Civic group (improving community) or charitable group (helping others)\
+8 Religious group\
+-222 Other Specify 1\
+-221 Other Specify 2\
+-223 Other Specify 3\
+-100 Not Applicable ***Drop this column***
+
+Columns `l1__221, l1__223, l1_sp2, l1_sp3` are blank; drop them.
+
+`l1_sp1` is of type text, it has not been cleaned.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("l1_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_l1 <- paste0("l1_", c(1:8, "_222", "_221", "_223", "_100", "sp1", "sp2", "sp3"))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_l1 <- lapply(colnames_l1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_l1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_l1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_l1 = col_class_l1, sorted_unique_l1 = sorted_uv_l1)
+})
+
+# Assign names to the results for clarity
+
+names(results_l1) <- colnames_l1
+
+# Print the results
+
+results_l1
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$rph_count)
+sort(unique(aMaizingBL_parent_data$rph_count), na.last = TRUE)
+
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rph_count = as.integer(rph_count)
+  )
+
+class(aMaizingBL_parent_data$rph_count)
+sort(unique(aMaizingBL_parent_data$rph_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rph`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rph`), na.last = TRUE)
+
+# ID column
+```
+
+Drop `start_efficacy` column
+
+Mutate column `m = Now I’m going to read for you statements . Please listen to each of the following statements. Think about how each statement relates to your life, and then tell me how much you agree or disagree with the statement on a scale of 1 to 5, where 1 means you “strongly disagree” and 5 means you “strongly agree.”`
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(m = NA)
+```
+
+```{r}
+# Checking class and unique values for m1:m8
+
+lapply(aMaizingBL_parent_data %>% 
+         select(m1:m8), function(x_m) {
+  list(
+    class_m = class(x_m),
+    unique_sorted_m = sort(unique(x_m), na.last = TRUE)
+  )
+})
+
+```
+
+1 Strongly Agree 2 Agree 3 Undecided 4 Disagree 5 Strongly disagree -888 Don’t know ***Replace with NA***
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  
+  # Replace -888 with NA_real_ for m1:m8
+  
+  mutate(across(
+    m1:m8, 
+    ~ case_when(
+      . == -888 ~ NA_real_,
+      TRUE ~ .
+    )
+  )) %>%
+
+# Convert m1:m8 to ordered factors with labels
+  
+  mutate(across(
+    m1:m8,
+    ~ factor(., levels = c(1:5), labels = c("Strongly Agree", "Agree",  "Undecided", "Disagree", "Strongly disagree"), ordered = TRUE)
+  )) %>%
+  
+# Reverse-code m1:m8 and creates new columns with "_reversed"
+  
+ mutate(across(
+    m1:m8,
+    ~ factor(., levels = rev(levels(.)), ordered = TRUE),
+    .names = "{.col}_reversed"  
+  ))
+
+# Check the class and sorted unique values for m_1_reversed:m_8_reversed
+
+lapply(aMaizingBL_parent_data %>% select(m1_reversed:m8_reversed), class)
+lapply(aMaizingBL_parent_data %>% select(m1_reversed:m8_reversed), function(x) sort(unique(x), na.last = TRUE))
+
+```
+
+Drop columns `"end_efficacy", "time_efficacy", "start_income"`
+
+```{r}
+class(aMaizingBL_parent_data$o1)
+sort(unique(aMaizingBL_parent_data$o1), na.last = TRUE)
+
+# Multiselect 
+```
+
+```{r}
+
+# Obtain names of columns starting with "o1_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("o1_")) %>%
+  names()
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_o1 <- paste0("o1_", c(1:18, "100",  "_222", "_221", "_223", "sp1",  "sp2",  "sp3" ))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_o1 <- lapply(colnames_o1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_o1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_o1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_o1 = col_class_o1, sorted_unique_o1 = sorted_uv_o1)
+})
+
+# Assign names to the results for clarity
+
+names(results_o1) <- colnames_o1
+
+# Print the results
+
+results_o1
+
+```
+
+`o1_sp1, o1_sp2, and o1_sp3` are text type columns and have not been cleaned.
+
+```{r}
+# Mutate multiple numeric columns to integer
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(across(starts_with("o1_"), ~ if(is.numeric(.)) as.integer(.) else .))
+
+```
+
+```{r}
+# Create a vector of column names 
+
+colnames_o1 <- paste0("o1_", c(1:18, "100",  "_222", "_221", "_223", "sp1",  "sp2",  "sp3" ))
+
+# Apply the class and sort(unique()) functions to each column
+
+results_o1 <- lapply(colnames_o1, function(col) {
+  
+  # Get the class of the column
+  
+col_class_o1 <- class(aMaizingBL_parent_data[[col]])
+  
+  # Get sorted unique values, with NA values last
+  
+sorted_uv_o1 <- sort(unique(aMaizingBL_parent_data[[col]]), na.last = TRUE)
+  
+  # Combine and return results as a list
+  
+list(class_o1 = col_class_o1, sorted_unique_o1 = sorted_uv_o1)
+})
+
+# Assign names to the results for clarity
+
+names(results_o1) <- colnames_o1
+
+# Print the results
+
+results_o1
+
+```
+
+```{r}
+class(aMaizingBL_parent_data$rp_income_count)
+sort(unique(aMaizingBL_parent_data$rp_income_count), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    rp_income_count = as.integer(rp_income_count)
+  )
+
+class(aMaizingBL_parent_data$rp_income_count)
+sort(unique(aMaizingBL_parent_data$rp_income_count), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$`SET-OF-rp_income`)
+#sort(unique(aMaizingBL_parent_data$`SET-OF-rp_income`), na.last = TRUE)
+
+# ID column
+```
+
+Mutate `p = What is the distance in walking minutes of the household to the infrastructure listed in the table below`
+
+```{r}
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(p = NA)
+```
+
+```{r}
+col_names_p <- c("p1", "p2", "p3", "p4", "p5")
+
+# Check the class() and sorted unique values for p1:p5
+
+result_p <- lapply(col_names_p, function(col_p) {
+  list(
+    class_p = class(aMaizingBL_parent_data[[col_p]]),
+    sorted_uv_p = sort(unique(aMaizingBL_parent_data[[col_p]]), na.last = TRUE)
+  )
+})
+
+# Print results for p1:p5
+
+names(result_p) <- col_names_p
+
+result_p
+
+```
+
+Drop columns `end_income", "time_income", "start_consumption"`
+
+```{r}
+class(aMaizingBL_parent_data$q0)
+sort(unique(aMaizingBL_parent_data$q0), na.last = TRUE)
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    q0 = factor(q0, levels = c(0, 1), labels = c("No", "Yes")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$q0)
+sort(unique(aMaizingBL_parent_data$q0), na.last = TRUE)
+```
+
+Mutate `q1 = I would like to ask you a few questions about the food that YOUR HOUSEHOLD consumed in the last 7 days. (Food Consumption 24 hours?)`
+
+```{r}
+ aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(q1 = NA)
+```
+
+```{r}
+# Obtain names of columns starting with "q1_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("q1_")) %>%
+  names()
+```
+
+```{r}
+
+# Check the class and sorted unique values for q1_1:q1_16
+
+lapply(aMaizingBL_parent_data %>% select(q1_1:q1_16), class)
+lapply(aMaizingBL_parent_data %>% select(q1_1:q1_16), function(x) sort(unique(x), na.last = TRUE))
+
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  
+# Convert q1_1:q1_16 to factors with labels
+  
+  mutate(across(
+    q1_1:q1_16,
+    ~ factor(., levels = c(0,1), labels = c("No", "Yes"))  #, ordered = TRUE)
+  )) 
+
+# Check the class and sorted unique values for q1_1:q1_16
+
+lapply(aMaizingBL_parent_data %>% select(q1_1:q1_16), class)
+lapply(aMaizingBL_parent_data %>% select(q1_1:q1_16), function(x) sort(unique(x), na.last = TRUE))
+
+```
+
+Mutate `q2 = I would like to ask you a few questions about the food that YOUR HOUSEHOLD consumed in the last 7 days. (Food Consumption  7 days?)`
+
+```{r}
+ aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(q2 = NA)
+```
+
+```{r}
+# Obtain names of columns starting with "q2_"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("q2_")) %>%
+  names()
+```
+
+```{r}
+
+# Check the class and sorted unique values for q2_1:q2_16
+
+lapply(aMaizingBL_parent_data %>% select(q2_1:q2_16), class)
+lapply(aMaizingBL_parent_data %>% select(q2_1:q2_16), function(x) sort(unique(x), na.last = TRUE))
+
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  
+# Convert q2_1:q2_16 to factors with labels
+  
+  mutate(across(
+    q2_1:q2_16,
+    ~ factor(., levels = c(0,1), labels = c("No", "Yes"))  #, ordered = TRUE)
+  )) 
+
+# Check the class and sorted unique values for q2_1:q2_16
+
+lapply(aMaizingBL_parent_data %>% select(q2_1:q2_16), class)
+lapply(aMaizingBL_parent_data %>% select(q2_1:q2_16), function(x) sort(unique(x), na.last = TRUE))
+
+```
+
+Drop columns `"end_consumption"  and "time_consumption"`
+
+```{r}
+class(aMaizingBL_parent_data$a7)
+# sort(unique(aMaizingBL_parent_data$a7), na.last = TRUE)
+
+# Phone number column
+```
+
+`a7` is a "personal identifiable information' column; drop it.
+
+```{r}
+class(aMaizingBL_parent_data$a7_1)
+sort(unique(aMaizingBL_parent_data$a7_1), na.last = TRUE)
+```
+
+1 Household head 2 Spouce 3 Other members of the household 4 Neighbour 5 Close Relative -222 Other Specify
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  mutate(
+    a7_1 = factor(a7_1, levels = c(1:5, -222), labels = c("Household head", "Spouse", "Other members of the household", "Neighbour", "Close Relative", "Other Specify")) #, ordered = TRUE)
+    
+  )
+
+class(aMaizingBL_parent_data$a7_1)
+sort(unique(aMaizingBL_parent_data$a7_1), na.last = TRUE)
+```
+
+```{r}
+class(aMaizingBL_parent_data$a7_1_sp)
+sort(unique(aMaizingBL_parent_data$a7_1_sp), na.last = TRUE)
+```
+
+Column `a7_1_sp` is blank; drop it.
+
+Drop `a7_1` as it is a follow-up question after `a7` (phone number).
+
+Drop columns `"end_total", "time_total", "instanceID", "formdef_version", "review_quality", "review_comments", "review_corrections"`
+
+```{r}
+# Check data dimension before dropping columns
+
+dim(aMaizingBL_parent_data) # 2112  771
+
+names(aMaizingBL_parent_data)
+```
+
+```{r}
+# Drop un-necessary columns
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  select(-c(1:11, 13:14, 16, 24:26, 34, 67:72, 81:103, 143:145, 164:165, 174, 176, 179, 183:185, 187, 196, 203, 204, 258, 261, 264, 266:268, 271:274, 282, 288, 290, 292, 298, 304, 326, 328, 338, 340:344, 350:351, 354, 356, 357:360, 362:367, 370, 374, 378, 380, 382, 384, 385, 387, 388, 390, 446:448, 520:522, 568, 571:572, 587, 589:590, 603:605, 607:608, 611, 620:622, 656:658, 692:694, 696, 701:704, 706:708, 719)) 
+  # %>%
+  # set_variable_labels(.labels = column_labels)
+
+# Check data dimension after dropping columns
+
+dim(aMaizingBL_parent_data) 
+
+```
+
+```{r}
+names(aMaizingBL_parent_data)
+
+```
+
+```{r}
+# Reorder columns
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  select(
+    1:23, 24, 564,25, 565, 26, 566, 27, 567, 28, 568, 29, 569, 30, 570, 31, 571, 32, 572, 33,573, 34:128,574, 129:136, 575, 137:181, 576, 182:301, 577, 302, 578, 303, 579, 304, 580, 305, 581, 306, 582,307, 583, 308, 584, 309, 585, 586, 310, 587, 311, 588, 312, 589, 313, 590, 314, 591, 315, 592, 316, 593,317, 594, 318, 595, 319, 596, 320, 597, 321, 598, 322, 599, 323, 324, 600, 325, 601, 326, 327, 602, 328, 329, 603, 330, 604, 331, 332,605, 333, 334, 335, 606, 336:357, 607, 358:361, 608, 362:402, 609, 403, 610, 404, 611, 405, 612, 406, 613, 407:483, 614, 484, 615, 485, 616, 486, 617, 487, 618, 488, 619, 489, 620, 490, 621, 491, 622, 492:519, 623, 520:525, 624, 526:541, 625, 542:562
+    
+    ) 
+
+```
+
+```{r}
+dim(aMaizingBL_parent_data)
+
+names(aMaizingBL_parent_data)
+```
+
+```{r}
+# Select all columns starting with "SET" or contains "-"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("SET") | contains("-")) %>%
+  names()
+
+
+```
+
+```{r}
+# Rename columns with characters not supported by stata
+
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  
+  rename(
+    
+    SET_OF_rp_plot = `SET-OF-rp_plot`,
+    SET_OF_rp_crop = `SET-OF-rp_crop`,
+    SET_OF_rpm7 = `SET-OF-rpm7`,
+    SET_OF_rg1_p = `SET-OF-rg1_p`,
+    SET_OF_rp_climate_info = `SET-OF-rp_climate_info`,
+    SET_OF_rp_csa_practices = `SET-OF-rp_csa_practices`,
+    SET_OF_rpf = `SET-OF-rpf`,
+    SET_OF_rp_finance = `SET-OF-rp_finance`,
+    SET_OF_rph = `SET-OF-rph`,
+    SET_OF_rp_income = `SET-OF-rp_income`,
+    latitude = `gps-Latitude`,
+    longitude = `gps-Longitude`,
+    altitude = `gps-Altitude`,
+    accuracy = `gps-Accuracy`
+
+         ) %>%
+  # Drop GPS columns and a7_1
+  
+  select(-c(620:624)) %>%
+  select(-ends_with("_reversed")) %>%
+  
+  #These columns/crops are not defined in the questionnaire
+  
+  select(-c(extra_crops_21, extra_crops_26, extra_crops_28, extra_crops_22, a2_5)) 
+
+dim(aMaizingBL_parent_data)
+```
+
+```{r}
+# Select all columns starting with "SET" or contains "-"
+
+aMaizingBL_parent_data %>%
+  select(starts_with("SET") | contains("-")) %>%
+  names()
+```
+
+```{r}
+#view(aMaizingBL_parent_data)
+```
+
+```{r}
+# Read a csv file - questionnaire form
+
+survey_qns_path <- "C:\\Users\\awanjau\\OneDrive - CGIAR\\Alliance\\Alliance_2024\\AMAZING\\aMaizingBaseline_Files\\survey.csv"
+
+survey_qns <- read_csv(survey_qns_path) %>%
+  select(name, label)
+
+survey_qns
+```
+
+```{r}
+# Create a vector with column names
+
+name <- names(aMaizingBL_parent_data)
+
+#name
+```
+
+```{r}
+
+# Convert `name` vector into a df
+
+name_df <- tibble(name = name)
+
+# Join `name_df` with `survey_qns` to get the labels
+
+name_labels <- name_df %>%
+  left_join(survey_qns, by = "name")
+
+
+View(name_labels)
+
+```
+
+```{r}
+# Save name_labels as csv
+
+readr::write_csv(name_labels, "name_labels.csv")
+
+```
+
+```{r}
+column_labels <- c(
+
+a1 = "Relevant Farmers ID",
+a2_3 =	"County",
+a2_4 =	"Subcounty",
+#a2_5 =	"Village",
+a4 =	"Do you have access to a phone within your household?",
+a5 =	"Is this your own phone?",
+a6 =	"Do you have access to a smartphone or a computer that can take photographs?",
+a8 =	"Can you access internet using your smartphone or computer?",
+a3 =	"What language would you be comfortable with in reading a text message?",
+b1 =	"Year of Birth of the respondent",
+b2 =	"Observe the Sex of the respondent",
+b3 =	"Marital status of the respondent",
+b4 =	"Year of schooling attained by the respondent (By Kenyan Education System)",
+b4_1 =	"Highest level of eduation attained bt the respondent",
+b5 =	"Main occupation of the farmers",
+b5_sp =	"Please Specify  Main Occupation",
+b6 =	"In a typical day, how many hours do you spend on b5_index?",
+b7_1 =	"Younger children [Age 0 – 5]",
+b7_2 =	"School-aged children [Age 6 – 18]",
+b7_3 =	"Working-age adults [Age 19 – 64]",
+b7_4 =	"Elderly adults [Age 65+]",
+hhsize =	"Household size",
+b8 =	"Who is the main decision maker in the household: Be guided by the following: Is a person within the household that makes the most decision regarding: Which crop to grow, seed to be used, crop land allocation, labour utilization, produce to be sold, what to do with the money generated, what is to be cooked or provides the money to purchases the ingredients  (Note: The main decision make is not necessarily the one giving money in the household)",
+c1 =	"How many household members are there?",
+c1_fct =	"How many household members are there? (levels)",
+c2 =	"How many household members have a mobile phone?",
+c2_fct =	"How many household members have a mobile phone? (levels)",
+c3 =	"Do any household members have a disability that gives them difficulties in engaging in an economic activity?",
+c3_fct =	"Do any household members have a disability that gives them difficulties in engaging in an economic activity? (levels)",
+c4 =	"In the last 7 days, did any household members work at least one hour on their own account or as an employer in a business enterprise, for example, as a trader, shopkeeper, barber, dressmaker, carpenter, taxi driver, car washer, and so on?",
+c4_fct =	"In the last 7 days, did any household members work at least one hour on their own account or as an employer in a business enterprise, for example, as a trader, shopkeeper, barber, dressmaker, carpenter, taxi driver, car washer, and so on? (levels)",
+c5 =	"In the last 7 days, were any household members casual workers?",
+c5_fct =	"In the last 7 days, were any household members casual workers? (levels)",
+c6 =	"Can the male head/spouse   read and write    in any language?",
+c6_fct =	"Can the male head/spouse   read and write    in any language? (levels)",
+c7 =	"What is the highest educational level that the (eldest) female head/spouse reached, and what is the highest grade that she completed at that level?",
+c7_fct =	"What is the highest educational level that the (eldest) female head/spouse reached, and what is the highest grade that she completed at that level? (levels)",
+c8 =	"How many habitable rooms does this household occupy in its main dwelling (do not count bathrooms, toilets, storerooms, or garages)?",
+c8_fct =	"How many habitable rooms does this household occupy in its main dwelling (do not count bathrooms, toilets, storerooms, or garages)? (levels)",
+c9 =	"What is the predominant wall material of the main dwelling unit?",
+c9_fct =	"What is the predominant wall material of the main dwelling unit? (levels)",
+c10 =	"Does the household have a functional television?",
+c10_fct =	"Does the household have a functional television? (levels)",
+d1 =	"Amount of land that was cultivated      and is Owned   ",
+d1_1 =	"Amount of land that was    uncultivated     and is    Owned    ",
+d2 =	"Amount of land that was cultivated     and is    Rented In   ",
+d2_1 =	"Amount of land that was      uncultivated     and is  Rented In   ",
+d3 =	"Total Amount of land that was  Rented Out  Cultivated  ",
+d3_1 =	"Total Amount of land that was      Rented Out  UnCultivated  ",
+d4 =	"Amount of land that was cultivated     and is Shared In   ",
+d4_1 =	"Amount of land that was uncultivated     and is    Shared In   ",
+d5 =	"Total amount of land that was cultivated     and is    Shared Out    ",
+d5_1 =	"Total amount of land that was    uncultivated     and is    Shared Out    ",
+totalland =	"Total land",
+d6_1 =	"Amount of land  Owned that was Under Irrigation",
+d6_2 =	"Amount of land  Owned that was Under Rainfed",
+d2_2 =	"Total amount of rent (KSh ) for Land Rented In",
+d3_2 =	"Total amount of rent (KSh) for Land Rented Out",
+e0 =	"How many plots of land did you utilize last season of 2022 (Long Rains April to August in Western Kenya and October to December in Eastern Kenya) to grow Maize, Sorghum, Common Beans, Green Gram, and Irish Potatoes?",
+rp_plot_count =	"Count of plot description",
+SET_OF_rp_plot =	"Plot description repeat group ID",
+plotid1 =	"plotid1",
+plotid2 =	"plotid2",
+plotid3 =	"plotid3",
+plotid4 =	"plotid4",
+plotid5 =	"plotid5",
+f0 =	"Which crops did the farmer grow?",
+f0_1 =	"Maize",
+f0_2 =	"Sorghum",
+f0_3 =	"Common Beans",
+f0_4 =	"Green Gram",
+f0_5 =	"Irish Potatoes",
+rp_crop_count =	"Count of f0",
+SET_OF_rp_crop =	"crop repeat group ID",
+extra_crops =	"Which other crops did you grow last season",
+extra_crops_1 =	"Maize",
+extra_crops_2 =	"Rice",
+extra_crops_3 =	"Wheat",
+extra_crops_4 =	"Sorghum",
+extra_crops_5 =	"Groundnut",
+extra_crops_6 =	"Pigeon pea",
+extra_crops_7 =	"Common bean",
+extra_crops_8 =	"Sunflower",
+extra_crops_9 =	"Sweet potatoes",
+extra_crops_10 =	"Irish potatoes",
+extra_crops_11 =	"Cassava",
+extra_crops_12 =	"Sesame",
+extra_crops_13 =	"Soyabean",
+extra_crops_14 =	"Bananas",
+extra_crops_15 =	"Tea",
+extra_crops_16 =	"Coffee",
+extra_crops_17 =	"Sugarcane",
+extra_crops_18 =	"Pinapples",
+extra_crops_19 =	"Millet",
+extra_crops_20 =	"Vegetables",
+extra_crops__222 =	"Other, specify",
+extra_crops__221 =	"Other, specify",
+extra_crops__220 =	"Other, specify",
+##extra_crops_21 =	,
+##extra_crops_26 =	,
+##extra_crops_28 =	,
+##extra_crops_22 =	,
+extra_crops_sp1 =	"Please Specify",
+extra_crops_sp2 =	"Please Specify",
+extra_crops_sp3 =	"Please Specify",
+g1 =	"Do you keep any livestock in your household",
+g1_1 =	"Which livestock did you keep",
+g1_1_1 =	"Indigenous milking cows",
+g1_1_2 =	"Cross-bred milking cows",
+g1_1_3 =	"Exotic milking cows",
+g1_1_4 =	"Non-milking cows (mature)",
+g1_1_5 =	"Trained oxen for ploughing",
+g1_1_6 =	"Bulls",
+g1_1_7 =	"Heifers",
+g1_1_8 =	"Calves",
+g1_1_9 =	"Goats",
+g1_1_10 =	"Sheep",
+g1_1_11 =	"Rabbit",
+g1_1_12 =	"Donkeys",
+g1_1_13 =	"Poultry",
+g1_1_18 =	"Chicken",
+g1_1_14 =	"Bee hives",
+g1_1_15 =	"Pigs",
+g1_1__222 =	"Other Specify",
+g1_1sp =	"Please Specify",
+rpm7_count =	"ount of g1",
+SET_OF_rpm7 =	"Livestock repeat group ID",
+g0_p =	"Did you sell any livestock product?",
+g1_p =	"Which product did you sell?",
+g1_p_1 =	"Milk",
+g1_p_2 =	"Yoghurt",
+g1_p_4 =	"Eggs",
+g1_p_6 =	"Honey",
+g1_p_7 =	"Fish",
+g1_p_9 =	"Manure",
+rg1_p_count =	"Count of g1_p",
+SET_OF_rg1_p =	"Livestock product repeat group ID",
+h1 =	"Are you aware of the existence of the following types of crop insurances in your community?", 
+h1_1 =	"Weather based crop insurance (WBI)",
+h1_2 =	"Picture based crop insurance (PBI)",
+h1_3 =	"Other crop insurance products offered by ACRE (e.g., Bima Pima, Bima Salama)",
+h1_4 =	"Other crop insurance product offered by other organizations (e.g area yield insurance)",
+h1_5 =	"Livestock insurance",
+h1__222 =	"Other crop insurance (Specify)",
+h1__666 =	"None",
+h1_sp =	"Please specify the Unit",
+h2 =	"Have you ever used the following types of crop insurances?",
+h2_1 =	"Weather based crop insurance (WBI)",
+h2_2 =	"Picture based crop insurance (PBI)",
+h2_3 =	"Other crop insurance products offered by ACRE (e.g., Bima Pima, Bima Salama)",
+h2_4 =	"Other crop insurance product offered by other organizations (e.g area yield insurance)",
+h2_5 =	"Livestock insurance",
+h2__222 =	"Other crop insurance (Specify)",
+h2__666 =	"None",
+h3 =	"Are you willing to use/adopt Weather based crop insurance (WBI) / Suppose you are asked to pay some amount before a weather-related peril such as drought, hailstone, flood etc occurs, so that in the event it occurs, the insurance will compensate you. Will you be willing to pay the money?",
+h3_1 =	"What is the maximum KES you are willing to pay as an up-front premium for CROP INSURANCE coverage next year considering your land size and output from your farms?",
+h4 =	"Some insurance providers use a lead farmer in your area to take picture of the crops at the same place and at each stage of growth (weekly). This helps the provided to monitor and assess the crop growth so that the mismatch in description of damages is eliminated. Are you willing to use/adopt this Picture-Based Insurance (PBI) for crops?",
+h4_1 =	"Considering your seasonal crop outputs, the total acreage of land you own/rent and the changing weather patterns, what premium in (KSH) would you be willing to pay per season per acre for Weather Based/ Picture Based crop insurance",
+h5 =	"Why are not willing to adopt.",
+h5_1 =	"I need time to understand how it works",
+h5_2 =	"Nobody offered me CROP INSURANCE",
+h5_3 =	"I don’t need it",
+h5_4 =	"Too expensive/ high premium",
+h5_5 =	"I didn’t have the money at that time",
+h5_6 =	"I don’t trust the insurance company (APA insurance -ACRE)/ Insurance is a fraudulent activity",
+h5_7 =	"I don’t trust the agent (champion farmer)",
+h5_8 =	"Coverage too low / payments don’t cover my losses/ Insurance companies don’t pay in time",
+h5_9 =	"I have personal experience in the past where it didn’t work",
+h5_10 =	"It didn’t work for my neighbour/friend",
+h5_11 =	"Irregular Income",
+h5_12 =	"Have never heard of Crop Insurance",
+h5__222 =	"Other, Specify",
+h5_sp =	"Please Specify",
+h6 =	"Have you received training on any type of insurance before?",
+h7 =	"Which type of insurance have you received training on?",
+h7_1 =	"Health insurance",
+h7_2 =	"Life insurance",
+h7_3 =	"Education insurance",
+h7_4 =	"Investment",
+h7_5 =	"Car insurance",
+h7_6 =	"Home insurance",
+h7_7 =	"Crop Insurance",
+h7__222 =	"Other Specify",
+h7_sp =	"Please Specify",
+h8 =	"Who provided the training?",
+h8_1 =	"ACRE Africa",
+h8_2 =	"Government extension service",
+h8_3 =	"Farmer Cooperatives or groups",
+h8_4 =	"Neighbour/relative farmers",
+h8_5 =	"NGOs",
+h8__222 =	"Other Specify",
+h8_sp =	"Please Specify",
+h9 =	"How much do you think other farmers in your area trust the recommendations of that trainer?",
+#h9_reversed =	,
+h10 =	"Did you take crop insurance in the last 5 years?",
+h11 =	"What are the main reasons for not having CROP INSURANCE in the last 5 years? [Multiple choice, don’t read options, mark all the ones that farmer mentions]",
+h11_1 =	"Nobody offered me CROP INSURANCE",
+h11_2 =	"I don’t need it",
+h11_3 =	"Too expensive/ high premium",
+h11_4 =	"I didn’t have the money at that time",
+h11_5 =	"I don’t trust the insurance company (APA insurance -ACRE)/ Insurance is a fraudulent activity",
+h11_6 =	"I don’t trust the agent (champion farmer)",
+h11_7 =	"Coverage too low / payments don’t cover my losses/ Insurance companies don’t pay in time",
+h11_8 =	"I have personal experience in the past where it didn’t work",
+h11_9 =	"It didn’t work for my neighbour/friend",
+h11__222 =	"Other Specify",
+h12 =	"What crops were covered?",
+h12_1 =	"Maize",
+h12_3 =	"Wheat",
+h12_4 =	"Sorghum",
+h12_6 =	"Pigeon pea",
+h12_7 =	"Common bean",
+h12_9 =	"Sweet potatoes",
+h12_13 =	"Soyabean",
+h12_14 =	"Bananas",
+h12_19 =	"Millet",
+h12_20 =	"Vegetables",
+h12__222 =	"Other, specify",
+h12_sp =	"Please Specify",
+h13 =	"Are there crops you feel would be better to insure than others?",
+h14 =	"Which crops would be better to insure?",
+h14_1 =	"Maize",
+h14_3 =	"Wheat",
+h14_4 =	"Sorghum",
+h14_5 =	"Groundnut",
+h14_6 =	"Pigeonpea",
+h14_7 =	"Common bean",
+h14_9 =	"Sweet potatoes",
+h14_11 =	"Cassava",
+h14_13 =	"Soyabean",
+h14_14 =	"Bananas",
+h14_15 =	"Tea",
+h14_16 =	"Coffee",
+h14_17 =	"Sugarcane",
+h14_19 =	"Millet",
+h14_20 =	"Vegetables",
+h14__222 =	"Other, specify",
+h14_sp =	"Please Specify",
+h15 =	"Why are some crops better to insure than others?",
+h10_1 =	"How many years have you been using the crop insurance?",
+h10_2 =	"During these years what is/was your experience with crop insurance?",
+h10_2_1 =	"There were delays in payment",
+h10_2_2 =	"Crop insurance is expensive",
+h10_2_3 =	"I received frequent advise and visit from the providers",
+h10_2__222 =	"Other Specify",
+h10_2_sp =	"Please Specify",
+h16 =	"For the crop you insured last season, what element did you insure?",
+h17 =	"Premium paid",
+h18 =	"Sum Insured",
+h19 =	"Was the premium affordable in relation to your income?",
+h20 =	"Do you feel that the value you insured adequately covers the amount of possible losses from past experience?",
+h21 =	"Were there any additional fees or costs associated with the policy besides premium?",
+h22 =	"How satisfied are you with the coverage provided by the crop insurance policy?",
+h23 =	"Do you know how to make a claim under your crop insurance policy?",
+h24 =	"Have you received a payout from your insurance?",
+h25 =	"How long did it take for your claim to be processed, and were you satisfied with the quality of service you received?",
+h26 =	"How much did you receive from the most recent claim?",
+h26_1 =	"Do you remember in some years you suffered loss and you did not receive any money?",
+h26_2 =	"If yes above, Why didn’t you receive the claim?",
+h27 =	"How did you make your premium payment?",
+h28 =	"Do you prefer any other method?",
+h29 =	"Where did you go to sign up for insurance?",
+h29_sp =	"Please Specify",
+h30 =	"How convenient was the location of the insurance trainer in relation to your farm or place of business?",
+h31 =	"Did you receive any additional services alongside the insurance policy?",
+h32 =	"Which additional services from other organisations alongside the insurance policy, did you receive?",
+h32_1 =	"Weather advisory",
+h32_2 =	"Input loan",
+h32_3 =	"Good Agricultural Practices",
+h32_4 =	"Other Specify",
+h33 =	"How helpful were the additional services from other organisations alongside the insurance policy?",
+h34 =	"Was it easy to understand the information provided about the policy before enrolling?",
+h35 =	"Were you aware of alternative insurance policies at the time of signing up?",
+h36 =	"Are there crops that you did not grow before and do now as a result of the benefits of the insurance package?",
+h37 =	"Which crops are these?",
+h37_1 =	"Maize",
+h37_4 =	"Sorghum",
+h37_5 =	"Groundnut",
+h37_7 =	"Common bean",
+h37_13 =	"Soyabean",
+h37_20 =	"Vegetables",
+h37__222 =	"Other, specify",
+h38 =	"Are there crops you no longer grow to create space for new crops?",
+h39 =	"Which crops are these?",
+h39_1 =	"Maize",
+h39_3 =	"Wheat",
+h39_4 =	"Sorghum",
+h39_5 =	"Groundnut",
+h39_7 =	"Common bean",
+h39_9 =	"Sweet potatoes",
+h39_11 =	"Cassava",
+h39_14 =	"Bananas",
+h39_17 =	"Sugarcane",
+h39_19 =	"Millet",
+h39_20 =	"Vegetables",
+h39__222 =	"Other, specify",
+h39_sp =	"Please Specify",
+h40 =	"Are there crops you give more attention to (in terms of time spent in field monitoring or additional input costs) than others during the growing season?",
+h41 =	"Did you take up insurance last season or have you taken up insurance this season",
+h42 =	"How many people in your community do you believe own crop insurance?",
+h43 =	"During the purchase of your cover, how easy was the sign up process?",
+h44 =	"In your opinion what are the main reasons for having CROP INSURANCE?",
+h44_1 =	"Somebody offered me CROP INSURANCE",
+h44_2 =	"I understand how it works",
+h44_3 =	"I need it",
+h44_4 =	"Cheap",
+h44_5 =	"I had the money at that time",
+h44_6 =	"I trust the insurance company (APA insurance -ACRE)",
+h44_7 =	"I trust the agent (champion farmer)",
+h44_8 =	"Coverage is reasonable / payments cover my losses",
+h44_9 =	"I have personal experience in the past where it worked",
+h44_10 =	"It worked for my neighbor/friend",
+h44__222 =	"Other, Specify",
+h44_sp =	"Please Specify",
+h45 =	"To what extent do you agree with the following statement?",
+h45_1 =	"a) CROP INSURANCE is easy to understand",
+#h45_1_reversed =	,
+h45_2 =	"b) CROP INSURANCE is easily available",
+#h45_2_reversed =	,
+h45_3 =	"c) CROP INSURANCE is cheap",
+#h45_3_reversed =	,
+h45_4 =	"d) CROP INSURANCE pays me in time",
+#h45_4_reversed =	,
+h45_5 =	"e) Under CROP INSURANCE, I expect to get a payment whenever I experience losses",
+#h45_5_reversed =	,
+h45_6 =	"f) In case of crop damage, I trust the CROP INSURANCE insurance company will know",
+#h45_6_reversed =	,
+h45_7 =	"g) CROP INSURANCE is of good quality",
+#h45_7_reversed =	,
+h45_8 =	"CROP INSURANCE is reliable (if there is severe crop damage due to rainfall, I would get a pay-out)",
+#h45_8_reversed =	,
+h46 =	"To what extent do you agree with the following statement?",
+h46_1 =	"Having access to CROP INSURANCE made/would make me spend more on fertilizer",
+#h46_1_reversed =	,
+h46_2 =	"Having access to CROP INSURANCE made/would make me spend more on chemicals",
+#h46_2_reversed =	,
+h46_3 =	"Having access to CROP INSURANCE made/would make me spend more on Pesticides/ insecticides",
+#h46_3_reversed =	,
+h46_4 =	"Having access to CROP INSURANCE increase/ increased my frequency of field visits",
+#h46_4_reversed =	,
+h46_5 =	"Having access to CROP INSURANCE increase/ increased my frequency of weeding the fields",
+#h46_5_reversed =	,
+h46_6 =	"Having access to CROP INSURANCE made/would make me hire more labor during planting season",
+#h46_6_reversed =	,
+h46_7 =	"Having access to CROP INSURANCE made/would make me hire more labor during harvest",
+#h46_7_reversed =	,
+h46_8 =	"Having access to CROP INSURANCE made/would make me adopt innovative technologies",
+#h46_8_reversed =	,
+h46_9 =	"Having access to CROP INSURANCE made/would make me spend more on seeds",
+#h46_9_reversed =	,
+h46_10 =	"Having access to CROP INSURANCE made/would make me buy higher quality seeds",
+#h46_10_reversed =	,
+h46_11 =	"Having access to CROP INSURANCE made/would make me buy stress tolerant seeds",
+#h46_11_reversed =	,
+h46_12 =	"Having access to CROP INSURANCE made/would make me grow different crops",
+#h46_12_reversed =	,
+h46_13 =	"Having access to CROP INSURANCE made/would make me increase the amount of land that you cultivate?",
+#h46_13_reversed =	,
+h47_1 =	"Have you ever heard of crop insurance bundled with inputs or access to credit or advisories?",
+h47_2 =	"Would you be more likely to purchase crop insurance if it was bundled with access to credit or inputs?",
+#h47_2_reversed =	,
+h47_3 =	"Would you be more likely to purchase crop insurance if it was bundled with access to climate advisories or weather forecasting services?",
+#h47_3_reversed =	,
+h47_4 =	"Have you ever purchased crop insurance bundled with access to credit or inputs?",
+h47_5 =	"Did bundling crop insurance with access to credit or inputs make crop insurance more affordable for you?",
+#h47_5_reversed =	,
+h47_6 =	"Have you ever received any crop advisories or weather forecasting services bundled with crop insurance?",
+h47_7 =	"Would you be willing to pay a slightly higher premium for crop insurance if it was bundled with access to credit or inputs or advisories or all?",
+#h47_7_reversed =	,
+h47_8 =	"Would you recommend crop insurance bundled with access to credit or inputs or advisories or all to other farmers in your community?",
+#h47_8_reversed =	,
+h47_9 =	"Have you received weather information services via sms as part of the crop insurance offered last season?",
+h47_10 =	"Are you comfortable using digital platforms such as mobile apps, websites, or social media to receive weather information services and advise?",
+#h47_10_reversed =	,
+h47_11 =	"How would you prefer receiving weather information?",
+h47_12 =	"How do digital weather information methods fare against traditional methods",
+h47_13 =	"Would you recommend digital climate information services and advisories to other farmers in your community?",
+#h47_13_reversed =	,
+i0 =	"Does the farmers have access to weather information and agro-advisory services?",
+i1 =	"From which sources did the farmer access weather information and agro-advisory services  from?",
+i1_1 =	"Meteorological Department",
+i1_2 =	"ACRE Africa",
+i1_3 =	"Government extension service",
+i1_4 =	"Farmer Cooperatives or groups",
+i1_5 =	"Seed traders",
+i1_6 =	"Neighbour/relative farmers",
+i1_7 =	"Internet",
+i1_8 =	"Radio",
+i1_9 =	"TV",
+i1_10 =	"Newspaper",
+i1_11 =	"Mobile phone",
+i1_12 =	"NGOs",
+i1_13 =	"Research centres",
+i1_14 =	"Indigenous knowledge/Observation",
+i1__222 =	"Other Specify",
+i1__2222 =	"Other Specify",
+i1_sp =	"Please Specify",
+i1_sp1 =	"Please Specify",
+rp_climate_info_count = "Count of i1",
+SET_OF_rp_climate_info =	"Climate information repeat group ID",
+i7 =	"If you are receiving weather information and agro-advisory services, how much do you pay per month",
+i7_1 =	"a. For weather information (Kshs. /Month)",
+i7_2 =	"b. For agro-advisory services (Kshs. /Month)",
+i7_3 =	"c. Combined cost (if receiving together, Kshs. /Month)",
+i8 =	"Was this previous season good, moderate or bad?",
+#i8_reversed =	,
+i9 =	"Has the weather patterns changed in the last 10 years",
+i10 =	"Do you foresee extreme weather changes in the Next 10 years?",
+i11 =	"If yes, would you be willing to cover your crops with CROP INSURANCE",
+i12 =	"Which CSA Practices has the farmers adopted in their farm?",
+i12_1 =	"Rainwater Harvesting- Farm Ponds",
+i12_2 =	"Drip Irrigation",
+i12_3 =	"Sprinkler Irrigation",
+i12_4 =	"Furrow Irrigated Bed Planting",
+i12_5 =	"Conservation Furrow",
+i12_6 =	"Raised Bed Planting",
+i12_7 =	"Drainage Management",
+i12_8 =	"Cover Crops Method",
+i12_9 =	"Zero/minimum tillage",
+i12_10 =	"Crop Rotation",
+i12_11 =	"Mulching",
+i12_12 =	"Solar Pumps",
+i12_13 =	"Site Specific Integrated Nutrient Management / Soil Sample",
+i12_14 =	"Concentrate Feeding for Livestock",
+i12_15 =	"Green Manuring",
+i12_16 =	"Intercropping with Legumes",
+i12_17 =	"Agro Forestry/Horticulture",
+i12_18 =	"Fodder Management",
+i12_19 =	"Bio-gas",
+i12_20 =	"Climate Smart Housing for Livestock",
+i12_21 =	"Climate Information (seasonal and in season)",
+i12_22 =	"Weather Based Crop Agro-Advisory",
+i12_23 =	"Crop Insurance",
+i12_24 =	"Contingent Crop Planning",
+i12_25 =	"Integrated Pest Management",
+i12_26 =	"Improved/Short Duration Crop Varieties",
+i12_27 =	"Fodder Banks",
+i12_28 =	"Seed Systems/Banks",
+i12_29 =	"Stress Tolerant High-Yielding Breeds of Livestock",
+i12_30 =	"Livestock & Fishery as Diversification Strategy",
+i12_100 =	"None",
+i12__222 =	"Other Specify",
+i12__2222 =	"Other Specify",
+i12_sp =	"Please Specify",
+i12_sp1 =	"Please Specify",
+rp_csa_practices_count =	"Count of i12",
+SET_OF_rp_csa_practices =	"CSA practices repeat group ID",
+i20 =	"CSA Practices Perception",
+i20_1 =	"Single technology is cost effective",
+#i20_1_reversed =	,
+i20_2 =	"Combination of technologies is cost effective",
+#i20_2_reversed =	,
+i20_3 =	"Single technology provides more benefits",
+#i20_3_reversed =	,
+i20_4 =	"Combination of technologies provides more benefits",
+#i20_4_reversed =	,
+j1 =	"Which of the following Assets do you own",
+j1_1 =	"Animal drawn Cart",
+j1_2 =	"Ox-ploughing set",
+j1_3 =	"Jembe",
+j1_4 =	"Axe",
+j1_5 =	"Sprayer",
+j1_6 =	"Sprinkler set/drip irrigation",
+j1_7 =	"Motorized grain mill (Posho Mill)",
+j1_8 =	"Water pump (hand, foot, diesel)",
+j1_9 =	"Harvester/thresher/shellers",
+j1_10 =	"Chaff Cutter",
+j1_11 =	"Spade or shovel",
+j1_12 =	"Radio, cassette or CD player",
+j1_13 =	"Cell phone",
+j1_14 =	"TV",
+j1_15 =	"Kerosene stove",
+j1_16 =	"Gas Stove",
+j1_17 =	"Water Tank",
+j1_18 =	"Bicycle",
+j1_19 =	"Motorbike/ Boda Boda",
+j1_20 =	"Cars",
+j1_21 =	"Tractors",
+j1_22 =	"Wheelbarrow",
+j1_23 =	"Jewelry: gold, silver, wristwatches",
+j1_24 =	"Wooden box",
+j1_25 =	"Metal boxes",
+j1_26 =	"Satellite dish",
+j1_27 =	"Wooden bed",
+j1_28 =	"Metal bed",
+j1_29 =	"Improved charcoal/wood stove",
+j1_30 =	"Chairs",
+j1_31 =	"Sofa set",
+j1_32 =	"Table",
+j1_33 =	"Grass roofed house",
+j1_33 = "Corrugated iron sheet house",
+j1_35 =	"Shelf/wardrobe",
+j1_36 =	"Pulverizer",
+j1_37 =	"Fridge",
+j1_38 =	"Tractor drawn equipment",
+j1_39 =	"Laptop",
+j1__222 =	"Other Specify 1",
+j1__221 =	"Other Specify 2",
+j1__223 =	"Other Specify 3",
+j1_sp1 =	"Please specify1",
+j1_sp2 =	"Please Specify 2",
+rpf_count =	"Count of j1",
+SET_OF_rpf =	"Household Assets repeat group ID",
+k0_1 =	"Do you have access to Credit?",
+k0_2 =	"Did you take up credit?",
+k1 =	"Next I’d like to ask if you took credit to purchase seed fertilizer or for any household item/activity",
+k1_1 =	"Crop Insurance",
+k1_2 =	"Non-governmental organization (NGO)",
+k1_3 =	"Formal lender (bank/financial institution/ Agricultural Finance Cooperation)",
+k1_4 =	"Informal lender (e.g Shylock)",
+k1_5 =	"Friends or relatives",
+k1_6 =	"Group based micro-finance or lending including VSLAs / SACCOs",
+k1_7 =	"Informal credit / savings groups (e.g., merry-go-rounds, funeral societies, etc.)",
+k1_8 =	"Mobile loans",
+k1__222 =	"Other Specify 1",
+k1__221 =	"Other Specify 2",
+k1__223 =	"Other Specify 3",
+k1_sp1 =	"Please specify1",
+rp_finance_count =	"Count of k1",
+SET_OF_rp_finance =	"Access to Finanicial Services repeat group ID",
+l1 =	"Are you a member of the following Group in your Community",
+l1_1 =	"Agricultural / livestock / fisheries producer’s group (including marketing groups)",
+l1_2 =	"Water users’ group",
+l1_3 =	"Forest users’ group",
+l1_4 =	"Credit or microfinance group (including SACCOs / merry-go-rounds / VSLAs)",
+l1_5 =	"Mutual help or insurance group (including burial societies)",
+l1_6 =	"Trade and business association group",
+l1_7 =	"Civic group (improving community) or charitable group (helping others)",
+l1_8 =	"Religious group",
+l1__222 =	"Other Specify 1",
+l1_sp1 =	"Please specify1",
+rph_count =	"Count of l1",
+SET_OF_rph =	"Group Membership repeat group ID",
+m =	"tell me how much you agree or disagree with the statement on a scale of 1 to 5, where 1 means you strongly disagree and 5 means you strongly agree.",
+  
+  #"Now I’m going to read for you statements . Please listen to each of the following statements. Think about how each statement relates to your life, and then tell me how much you agree or disagree with the statement on a scale of 1 to 5, where 1 means you “strongly disagree” and 5 means you “strongly agree.”",
+  
+m1 =	"I will be able to achieve most of the goals that I have set for myself.",
+#m1_reversed =	,
+m2 =	"When facing difficult tasks, I am certain that I will accomplish them.",
+#m2_reversed =	,
+m3 =	"In general, I think that I can obtain outcomes that are important to me.",
+#m3_reversed =	,
+m4 =	"I believe I can succeed at most any endeavor to which I set my mind",
+#m4_reversed =	,
+m5 =	"I will be able to successfully overcome many challenges.",
+#m5_reversed =	,
+m6 =	"I am confident that I can perform effectively on many different tasks.",
+#m6_reversed =	,
+m7 =	"Compared to other people, I can do most tasks very well.",
+#m7_reversed =	,
+m8 =	"Even when things are tough, I can perform quite well.",
+#m8_reversed =	,
+o1 =	"Did your household earn income from the below Sources?",
+o1_1 =	"Selling of crop residue (by product)",
+o1_2 =	"Rented out oxen for ploughing",
+o1_3 =	"Salaried employment",
+o1_4 =	"Casual non-farm labour",
+o1_5 =	"Casual farm labour",
+o1_6 =	"Non-farm agribusiness NET income (e.g. grain mill)",
+o1_7 =	"Other business NET income (shops, trade, tailor, etc)",
+o1_8 =	"Pension income",
+o1_9 =	"Drought relief",
+o1_10 =	"Safety net or food for work",
+o1_11 =	"Remittances (sent from non-resident family and relatives living elsewhere)",
+o1_12 =	"Marriage Gifts",
+o1_13 =	"Sale of own trees (firewood, etc)",
+o1_14 =	"Sale of dung /Manure",
+o1_15 =	"Sales from CPRs (firewood, charcoal making etc)",
+o1_16 =	"Rental of property (other than land)",
+o1_17 =	"Cash Transfer",
+o1_18 =	"Dividends",
+o1_100 =	"No Income",
+o1__222 =	"Other Specify 1",
+o1__221 =	"Other Specify 2",
+o1__223 =	"Other Specify 3",
+o1_sp1 =	"Please specify1",
+o1_sp2 =	"Please Specify 2",
+o1_sp3 =	"Please Specify 3",
+rp_income_count =	"Count of o1",
+SET_OF_rp_income =	"Income repeat group ID",
+p =	"What is the distance in walking minutes of the household to the infrastructure listed in the table below",
+p1 =	"Local market",
+p2 =	"Nearest livestock market",
+p3 =	"Nearest School",
+p4 =	"Source of Farm Inputs",
+p5 =	"Nearest clinic",
+q0 =	"Was Yesterday a normal day?",
+q1 =	"I would like to ask you a few questions about the food that YOUR HOUSEHOLD consumed in the last 7 days. Food Consumption 24 hours?",
+q1_1 =	"Did your household consume   Cereals in the last 24 hours?",
+q1_2 =	"Did your household consume   White roots and tubers in the last 24 hours?",
+q1_3 =	"Did your household consume    Vitamin A rich vegetables and tuber   in the last 24 hours?",
+q1_4 =	"Did your household consume  Dark green leafy vegetables   in the last 24 hours?",
+q1_5 =	"Did your household consume Other Vegetables   in the last 24 hours?",
+q1_6 =	"Did your household consume   Vitamin A rich fruits  in the last 24 hours?",
+q1_7 =	"Did your household consume   Other fruits    in the last 24 hours?",
+q1_8 =	"Did your household consume   Organ meat   in the last 24 hours?",
+q1_9 =	"Did your household consume  Flesh meats  in the last 24 hours?",
+q1_10 =	"Did your household consume  Eggs in the last 24 hours?",
+q1_11 =	"Did your household consume  Fish and Seafood  in the last 24 hours?",
+q1_12 =	"Did your household consume   Legumes, nuts and seeds   in the last 24 hours?",
+q1_13 =	"Did your household consume   Milk and milk products   in the last 24 hours?",
+q1_14 =	"Did your household consume   Oils and fats    in the last 24 hours?",
+q1_15 =	"Did your household consume  Sugar or Sweets    in the last 24 hours?",
+q1_16 =	"Did your household consume   Spices, condiments, beverage  in the last 24 hours?",
+q2 =	"I would like to ask you a few questions about the food that YOUR HOUSEHOLD consumed in the last 7 days. Food Consumption 7 days?",
+q2_1 =	"Did your household consume   Cereals in the last 7 days?",
+q2_2 =	"Did your household consume   White roots and tubers in the last 7 days?",
+q2_3 =	"Did your household consume    Vitamin A rich vegetables and tuber   in the last 7 days?",
+q2_4 =	"Did your household consume  Dark green leafy vegetables   in the last 7 days?",
+q2_5 =	"Did your household consume Other Vegetables   in the last 7 days?",
+q2_6 =	"Did your household consume   Vitamin A rich fruits  in the last 7 days?",
+q2_7 =	"Did your household consume   Other fruits    in the last 7 days?",
+q2_8 =	"Did your household consume   Organ meat   in the last 7 days?",
+q2_9 =	"Did your household consume  Flesh meats  in the last 7 days?",
+q2_10 =	"Did your household consume  Eggs in the last 7 days?",
+q2_11 =	"Did your household consume  Fish and Seafood  in the last 7 days?",
+q2_12 =	"Did your household consume   Legumes, nuts and seeds   in the last 7 days?",
+q2_13 =	"Did your household consume   Milk and milk products   in the last 7 days?",
+q2_14 =	"Did your household consume   Oils and fats    in the last 7 days?",
+q2_15 =	"Did your household consume  Sugar or Sweets    in the last 7 days?",
+q2_16 =	"Did your household consume   Spices, condiments, beverage  in the last 7 days?"
+
+)
+
+length(column_labels)
+
+```
+
+```{r}
+# Check the difference in name (colnames(aMaizingBL_parent_data) = 573) = column_labels (has length = 572)
+
+setdiff(names(column_labels), colnames(aMaizingBL_parent_data))
+setdiff(colnames(aMaizingBL_parent_data), names(column_labels)) # "j1_34" is was in data but not in column_labels. Added.
+  
+```
+
+```{r}
+aMaizingBL_parent_data <- aMaizingBL_parent_data %>%
+  set_variable_labels(.labels = column_labels)
+```
+
+Using the function View() to open the new data in a spreadsheet reveals the column names and labels.
+
+```{r}
+
+View(aMaizingBL_parent_data)
+
+```
+
+## Generate a data dictionary
+
+```{r}
+# Data dictionary
+
+aMaizingBL_parent_data_dict <- look_for(aMaizingBL_parent_data, labels = TRUE, values = TRUE) #%>%
+  #dplyr::select(-c(missing, value_labels))
+
+  kable(aMaizingBL_parent_data_dict)
+  
+  #aMaizingBL_parent_data_dict
+
+```
+
+## Generate codebook
+
+```{r}
+# Requires package datawizard
+
+#data_codebook(aMaizingBL_parent_data)
+
+#data_codebook(aMaizingBL_parent_data)
+
+dim(aMaizingBL_parent_data)
+```
+
+code: data_codebook(aMaizingBL_parent_data)
+
+Error: Error in data.frame(variable_label, values, value_labels, frq, proportions, : arguments imply differing number of rows: 1, 5, 3
+
+## Export data dictionary to CSV
+
+```{r}
+
+readr::write_csv(aMaizingBL_parent_data_dict, "aMaizingBL_parent_data_dict.csv")
+
+```
+
+## Export data to CSV
+
+```{r}
+
+readr::write_csv(aMaizingBL_parent_data, "aMaizingBL_parent_data.csv")
+
+```
+
+## Save as R data
+
+```{r}
+
+save(aMaizingBL_parent_data, file = "aMaizingBL_parent_data.RData")
+```
+
+## Export data to SPSS
+
+```{r}
+
+write.foreign(aMaizingBL_parent_data, "aMaizingBL_parent_data.sav", "aMaizingBL_parent_data", package = "SPSS")
+
+```
+
+## Export data to STATA
+
+```{r}
+
+write_dta(aMaizingBL_parent_data, "aMaizingBL_parent_data.dta")
+
+```
+
+# NOTES
+
+-   ***Please confirm the unit for h25.***
+
+# Codebook
+
+```{r}
+# library(dataMaid)
+# makeCodebook(aMaizingBL_parent_data)
+```
